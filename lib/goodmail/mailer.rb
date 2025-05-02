@@ -15,13 +15,23 @@ module Goodmail
     # This instance method acts as the mailer action.
     # It's called via Goodmail::Mailer.compose_message(...)
     # Action Mailer wraps the result in a MessageDelivery object.
+    # It also adds the List-Unsubscribe header if url is provided.
     # @api internal
-    def compose_message(headers, html_body, text_body)
+    def compose_message(headers, html_body, text_body, unsubscribe_url)
       # Call the instance-level `mail` method provided by ActionMailer::Base
+      # This implicitly builds the `message` object.
       mail(headers) do |format|
         format.text { render plain: text_body }
         format.html { render html: html_body.html_safe }
       end
+
+      # Add List-Unsubscribe header *after* mail() has built the message object.
+      # This ensures the modification happens within the mailer action context.
+      if unsubscribe_url.is_a?(String) && !unsubscribe_url.strip.empty?
+        message.headers["List-Unsubscribe"] = "<#{unsubscribe_url.strip}>"
+      end
+
+      # Action Mailer automatically returns the MessageDelivery object
     end
   end
 end

@@ -7,7 +7,7 @@ Goodmail is an opinionated, minimal, expressive Ruby DSL for sending beautiful, 
 
 There's only one template. You can't change it. It turns your ugly, default, text-only emails into SaaS-ready emails.
 
-Drop it in, call `Goodmail.compose`, and ship decent emails that look great everywhere.
+Add the gem, call `Goodmail.compose`, and ship decent emails that look great everywhere.
 
 ## Installation
 
@@ -23,12 +23,6 @@ And then execute:
 bundle install
 ```
 
-Or install it yourself as:
-
-```bash
-gem install goodmail
-```
-
 ## Configuration
 
 Goodmail comes with sensible defaults, but you can customize its appearance and behavior.
@@ -39,7 +33,7 @@ Create an initializer file at `config/initializers/goodmail.rb`:
 # config/initializers/goodmail.rb
 
 Goodmail.configure do |config|
-  # The main accent color used for buttons and links in the email.
+  # The main accent color used for buttons and links in the email body.
   # Default: "#348eda"
   config.brand_color = "#E62F17" # Your brand's primary color
 
@@ -52,11 +46,26 @@ Goodmail.configure do |config|
   # Default: nil
   config.logo_url = "https://cdn.myapp.com/images/email_logo.png"
 
-  # Optional: Fallback base URL for generated unsubscribe links if Rails URL helpers
-  # are unavailable or not configured correctly. Usually handled by Action Mailer's
-  # default_url_options.
-  # Default: "http://localhost:3000"
-  # config.base_url = "https://myapp.com"
+  # Optional: Custom text displayed in the footer below the copyright.
+  # Use this to explain why the user received the email.
+  # Default: nil
+  config.footer_text = "You are receiving this email because you signed up for an account at MyApp."
+
+  # Optional: Global default URL for unsubscribe links (both the List-Unsubscribe
+  # header and the optional visible link in the footer).
+  # Goodmail *does not* handle the unsubscribe logic; you must provide a valid URL.
+  # Can be overridden per email via headers[:unsubscribe_url].
+  # Default: nil
+  config.unsubscribe_url = "https://myapp.com/emails/unsubscribe"
+
+  # Optional: Whether to show a visible unsubscribe link in the footer.
+  # Requires an unsubscribe URL to be set (globally or per-email).
+  # Default: false
+  config.show_footer_unsubscribe_link = true
+
+  # Optional: The text for the visible footer unsubscribe link.
+  # Default: "Unsubscribe"
+  config.footer_unsubscribe_link_text = "Click here to unsubscribe"
 end
 ```
 
@@ -77,6 +86,7 @@ mail = Goodmail.compose(
   to: recipient.email,
   from: ""MyApp Support" <support@myapp.com>",
   subject: "Welcome to MyApp!"
+  # No unsubscribe header or link for this email
 ) do
   h1 "Welcome aboard, #{recipient.name}!"
   text "We're thrilled to have you join the MyApp community."
@@ -122,38 +132,38 @@ Inside the `Goodmail.compose` block, you have access to these methods:
 *   `sign(name = Goodmail.config.company_name)`: Adds a standard closing signature line.
 *   `html(raw_html_string)`: **Use with caution.** Allows embedding raw HTML. Useful for complex cases or escaping the DSL, but bypasses standard formatting.
 
-### Unsubscribe Link
+### Adding Unsubscribe Functionality
 
-To automatically add a `List-Unsubscribe` header when building the email:
+Goodmail helps you add the `List-Unsubscribe` header and an optional visible link, but **you must provide the actual URL** where users can unsubscribe. Goodmail does not generate unsubscribe URLs or handle the logic.
 
-1.  **Set `unsubscribe: true` in the headers:**
+1.  **Provide the URL:** You have two options:
+    *   **Globally:** Set `config.unsubscribe_url = "your_global_url"` in the initializer (`config/initializers/goodmail.rb`).
+    *   **Per-Email:** Pass `unsubscribe_url: "your_specific_url"` in the headers hash when calling `Goodmail.compose`. This overrides the global setting for that email.
 
     ```ruby
+    # Example using per-email override
     mail = Goodmail.compose(
       to: recipient.email,
       # ... other headers ...
-      unsubscribe: true
+      unsubscribe_url: manage_subscription_url(recipient) # Your app's URL helper
     ) do
       # ... email content ...
     end
     ```
+    *If an `unsubscribe_url` is provided (either globally or per-email), Goodmail will automatically add the standard `List-Unsubscribe` header.*
 
-2.  **Ensure Rails URL helpers work OR configure `base_url`:**
-    *   **Recommended:** Define an unsubscribe route in your `config/routes.rb` named `unsubscribe_email` that accepts the recipient's email (properly constrained), and ensure `config.action_mailer.default_url_options` is set in your environment files.
-    ```ruby
-    # config/routes.rb
-    get 'emails/unsubscribe/:email', to: 'email_unsubscribes#destroy', as: :unsubscribe_email, constraints: { email: /.+@.+\..+/ }
-    ```
-    *   **Fallback:** If URL helpers aren't set up, Goodmail uses `Goodmail.config.base_url` combined with `/emails/unsubscribe/:email` (recipient email will be URL-escaped).
-
-3.  **Provide a specific URL:** You can also pass a full URL string directly:
+2.  **Optionally Show Footer Link:**
+    *   To show a visible link in the email footer, set `config.show_footer_unsubscribe_link = true` in the initializer.
+    *   You can customize the link text with `config.footer_unsubscribe_link_text` (default: "Unsubscribe").
+    *   *Note: The footer link only appears if an `unsubscribe_url` was provided (step 1) AND `config.show_footer_unsubscribe_link` is true.* 
 
     ```ruby
-    mail = Goodmail.compose(
-      # ... headers ...
-      unsubscribe: generate_custom_unsubscribe_url(recipient)
-    ) do
-      # ...
+    # config/initializers/goodmail.rb
+    Goodmail.configure do |config|
+      # ... other settings
+      config.unsubscribe_url = "https://myapp.com/preferences"
+      config.show_footer_unsubscribe_link = true
+      config.footer_unsubscribe_link_text = "Manage email preferences"
     end
     ```
 

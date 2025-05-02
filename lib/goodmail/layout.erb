@@ -64,9 +64,11 @@
       color: #999;
       font-size: 12px;
       text-align: center;
+      padding: 0 0 10px; /* Add padding between footer lines */
     }
     .footer a {
         text-decoration: underline;
+        color: #999; /* Keep footer links grey */
     }
 
     /* Typography */
@@ -195,20 +197,31 @@
         <!-- Footer Section -->
         <div class="footer" style="font-family: 'Helvetica Neue',Helvetica,Arial,sans-serif; box-sizing: border-box; font-size: 14px; width: 100%; clear: both; color: #999; margin: 20px 0 0; padding: 20px;">
           <table width="100%" style="font-family: 'Helvetica Neue',Helvetica,Arial,sans-serif; box-sizing: border-box; font-size: 14px; margin: 0;">
+            <!-- Copyright -->
             <tr style="font-family: 'Helvetica Neue',Helvetica,Arial,sans-serif; box-sizing: border-box; font-size: 14px; margin: 0;">
-              <td class="aligncenter content-block" style="font-family: 'Helvetica Neue',Helvetica,Arial,sans-serif; box-sizing: border-box; font-size: 12px; vertical-align: top; color: #999; text-align: center; margin: 0; padding: 0 0 10px;" align="center" valign="top">
+              <td class="aligncenter content-block" style="font-family: 'Helvetica Neue',Helvetica,Arial,sans-serif; box-sizing: border-box; font-size: 12px; vertical-align: top; text-align: center; margin: 0; padding: 0 0 10px; color: #999;" align="center" valign="top">
                 &copy; <%= Date.today.year %> <%= config.company_name %>
-                <!-- Add address or other standard footer info here if desired -->
               </td>
             </tr>
-            <!-- Optional: Add unsubscribe info/link automatically or via config -->
-            <!--
-            <tr style="font-family: 'Helvetica Neue',Helvetica,Arial,sans-serif; box-sizing: border-box; font-size: 14px; margin: 0;">
-              <td class="aligncenter content-block" style="font-family: 'Helvetica Neue',Helvetica,Arial,sans-serif; box-sizing: border-box; font-size: 12px; vertical-align: top; color: #999; text-align: center; margin: 0; padding: 0 0 10px;" align="center" valign="top">
-                <a href="#">Unsubscribe</a> from these emails.
-              </td>
-            </tr>
-            -->
+
+            <!-- Optional Footer Text -->
+            <% if config.footer_text.present? %>
+              <tr style="font-family: 'Helvetica Neue',Helvetica,Arial,sans-serif; box-sizing: border-box; font-size: 14px; margin: 0;">
+                <td class="aligncenter content-block" style="font-family: 'Helvetica Neue',Helvetica,Arial,sans-serif; box-sizing: border-box; font-size: 12px; vertical-align: top; text-align: center; margin: 0; padding: 0 0 10px; color: #999;" align="center" valign="top">
+                  <%= config.footer_text %>
+                </td>
+              </tr>
+            <% end %>
+
+            <!-- Optional Unsubscribe Link -->
+            <% if config.show_footer_unsubscribe_link && defined?(unsubscribe_url) && unsubscribe_url.present? %>
+              <tr style="font-family: 'Helvetica Neue',Helvetica,Arial,sans-serif; box-sizing: border-box; font-size: 14px; margin: 0;">
+                <td class="aligncenter content-block" style="font-family: 'Helvetica Neue',Helvetica,Arial,sans-serif; box-sizing: border-box; font-size: 12px; vertical-align: top; text-align: center; margin: 0; padding: 0 0 10px; color: #999;" align="center" valign="top">
+                  <a href="<%= unsubscribe_url %>" style="color: #999;"><%= config.footer_unsubscribe_link_text %></a>
+                </td>
+              </tr>
+            <% end %>
+
           </table>
         </div>
 

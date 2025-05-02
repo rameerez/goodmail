@@ -9,7 +9,16 @@ module Goodmail
       brand_color:  "#348eda",
       company_name: "Example Inc.",
       logo_url:     nil,
-      base_url:     "http://localhost:3000"
+      # Optional footer text (e.g., "Why you received this email")
+      footer_text:  nil,
+      # Optional: Global default unsubscribe URL.
+      # Can be overridden per email via headers[:unsubscribe_url].
+      # User is responsible for providing a valid URL to manage email subscriptions.
+      unsubscribe_url: nil,
+      # Show a visible unsubscribe link in the footer?
+      show_footer_unsubscribe_link: false,
+      # Text for the footer unsubscribe link
+      footer_unsubscribe_link_text: "Unsubscribe"
     ).freeze # Freeze the default object to prevent accidental modification
 
     # Provides the configuration block helper.

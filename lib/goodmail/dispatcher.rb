@@ -10,7 +10,6 @@ module Goodmail
 
     # Builds the Mail::Message object with HTML and Text parts, wrapped in
     # an ActionMailer::MessageDelivery object.
-    # This method is intended to be called internally by Goodmail.compose
     # @api private
     def build_message(headers, &block)
       # 1. Initialize the Builder
@@ -19,70 +18,46 @@ module Goodmail
       # 2. Execute the DSL block within the Builder instance
       builder.instance_eval(&block) if block_given?
 
-      # 3. Render the HTML body using the Layout
-      html_body = Goodmail::Layout.render(builder.html_output, headers[:subject])
+      # 3. Determine the final unsubscribe URL (user-provided)
+      unsubscribe_url = headers[:unsubscribe_url] || Goodmail.config.unsubscribe_url
 
-      # 4. Generate a plaintext version from the Builder's raw HTML output
-      #    (before it's put into the layout)
+      # 4. Render the HTML body using the Layout, passing unsubscribe URL
+      html_body = Goodmail::Layout.render(
+        builder.html_output,
+        headers[:subject],
+        unsubscribe_url: unsubscribe_url # Pass determined URL to layout renderer
+      )
+
+      # 5. Generate plaintext version
       text_body = generate_plaintext(builder.html_output)
 
-      # 5. Slice the headers we pass to the mailer action
+      # 6. Slice standard headers for the mailer action
+      #    We no longer need to exclude unsubscribe_url here, as the mailer
+      #    doesn't use it directly in the mail() call anymore.
       mailer_headers = slice_mail_headers(headers)
 
-      # 6. Build the mail object by calling the mailer action on the internal Mailer class.
-      delivery_object = Goodmail::Mailer.compose_message(mailer_headers, html_body, text_body)
-
-      # 7. Add List-Unsubscribe header if requested (needs full headers)
-      add_list_unsubscribe(delivery_object.message, headers)
+      # 7. Build the mail object by calling the mailer action on the internal Mailer class.
+      #    Pass the unsubscribe_url so the mailer can add the header internally.
+      delivery_object = Goodmail::Mailer.compose_message(
+        mailer_headers,
+        html_body,
+        text_body,
+        unsubscribe_url # Pass URL to mailer action
+      )
 
       # 8. Return the ActionMailer::MessageDelivery object
+      #    (List-Unsubscribe header added inside compose_message)
       delivery_object
     end
 
     private
 
-    # Whitelist headers to pass to ActionMailer for the main mail() call
+    # Whitelist standard headers to pass to ActionMailer's mail() method
     def slice_mail_headers(h)
       h.slice(:to, :from, :cc, :bcc, :reply_to, :subject)
     end
 
-    # Adds the List-Unsubscribe header using the original full headers hash.
-    def add_list_unsubscribe(mail, headers)
-      unsubscribe_setting = headers[:unsubscribe]
-      return unless unsubscribe_setting
-      message = mail.is_a?(Mail::Message) ? mail : mail.try(:message)
-      return unless message # Safety check
-
-      unsubscribe_url = case unsubscribe_setting
-                        when true then generate_unsubscribe_url(headers[:to])
-                        when String then unsubscribe_setting
-                        else nil
-                        end
-      return unless unsubscribe_url
-      message.header["List-Unsubscribe"] = "<#{unsubscribe_url}>"
-    end
-
-    # Generates a default unsubscribe URL.
-    def generate_unsubscribe_url(recipient)
-      recipient_email = Array(recipient).first
-      return nil unless recipient_email
-      url_helpers_defined = defined?(Rails.application.routes.url_helpers)
-      mailer_opts_defined = defined?(Rails.application.config.action_mailer.default_url_options)
-      if url_helpers_defined && mailer_opts_defined
-        host = Rails.application.config.action_mailer.default_url_options[:host]
-        protocol = Rails.application.config.action_mailer.default_url_options[:protocol] || 'http'
-        if host && Rails.application.routes.url_helpers.respond_to?(:unsubscribe_email_url)
-          begin
-            return Rails.application.routes.url_helpers.unsubscribe_email_url(recipient_email, host: host, protocol: protocol)
-          rescue ArgumentError, NoMethodError => e
-            warn "[Goodmail] WARN: Failed to generate unsubscribe URL with unsubscribe_email_url: #{e.message}. Falling back to config.base_url."
-          end
-        else
-          warn "[Goodmail] WARN: Cannot generate unsubscribe URL via helpers (check route/host). Falling back to config.base_url."
-        end
-      end
-      File.join(Goodmail.config.base_url, "emails/unsubscribe", CGI.escape(recipient_email))
-    end
+    # Removed add_list_unsubscribe_header - logic moved into Mailer#compose_message
 
     # Improved HTML tag stripper for plaintext generation.
     def generate_plaintext(html)
