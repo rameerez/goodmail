@@ -75,18 +75,17 @@ Make sure to restart your Rails server after creating or modifying the initializ
 
 Use the `Goodmail.compose` method to compose emails using the DSL, then call `.deliver_now` or `.deliver_later` on it (your usual standard Action Mailer methods)
 
-### Basic Example
 
 ```ruby
 # In a controller action, background job, or service object
 Goodmail.compose(to: user.email, subject: "Welcome!") do
-  greeting "Hey #{user.first_name},"
+  text "Hey #{user.first_name},"
   text     "Thanks for joining. Confirm below:"
   button   "Confirm account", confirm_url
 end.deliver_now
 ```
 
-### Deliver Later (Background Job)
+You can also call `.deliver_later`:
 
 ```ruby
 mail = Goodmail.compose(
@@ -101,6 +100,29 @@ mail.deliver_later
 ```
 
 *(Requires Active Job configured.)*
+
+## Why does `goodmail` exist?
+
+Here's the problem: you can't just use standard HTML and CSS in mails.
+
+Emails are notoriously complicated to work with, because they're very difficult to style.
+
+Modern CSS doesn't work in mails, because email clients render styles differently and some only support a primitive subset of HTML / CSS.
+
+So, for example, you can't use stylesheets **at all**: all CSS needs to be inlined. You can't use many modern CSS properties either.
+
+This is why many emails still use `<table>` elements, for example. It's the only way of making mails look good!
+
+In fact, Mailgun released years ago [a few battle-tested HTML templates for emails](https://github.com/mailgun/transactional-email-templates). I took one of those email templates and have been using it in my projects for years.
+
+So, can't this just be an Action Mailer `.erb` template instead?
+
+I thought the same! And that's actually how I started using it. But after using it for years I realized I ended up building my own "proto-DSL" around it: I decomposed the email HTML template in partials, I was copying the same partials from project to project, etc. And setting up good emails in every new project took me a while because each project would have slight inconsistencies in the mail partials.
+
+So making it into a gem with a simple DSL was my solution to solve this email HTML mess.
+
+
+## Usage
 
 ### Available DSL Methods
 
