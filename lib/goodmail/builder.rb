@@ -34,16 +34,62 @@ module Goodmail
     end
 
     def button(text, url)
-      # Use a class for easier styling via layout CSS
-      parts << %(<div class="goodmail-button" style="text-align: center; margin: 24px 0;"><a href="#{h url}"><span style=\"color:#ffffff;\">#{h text}</span></a></div>)
+      # Standard HTML button link
+      button_html = %(<a href="#{h url}" class="goodmail-button-link" style="color:#ffffff;">#{h text}</a>)
+      # VML fallback for Outlook
+      vml_button = <<~VML
+        <v:roundrect xmlns:v="urn:schemas-microsoft-com:vml" xmlns:w="urn:schemas-microsoft-com:office:word" href="#{h url}" style="height:44px; v-text-anchor:middle; width:200px;" arcsize="10%" stroke="f" fillcolor="#{Goodmail.config.brand_color}">
+          <w:anchorlock/>
+          <center style="color:#ffffff; font-family:sans-serif; font-size:14px; font-weight:bold;">
+            #{h text}
+          </center>
+        </v:roundrect>
+      VML
+      # MSO conditional wrapper
+      mso_wrapper = <<~MSO
+        <!--[if mso]>
+        <table width="100%" cellpadding="0" cellspacing="0" border="0" style="border-spacing: 0; border-collapse: collapse; mso-table-lspace:0pt; mso-table-rspace:0pt;"><tr><td style="padding: 10px 0;" align="center">
+        #{vml_button.strip}
+        </td></tr></table>
+        <![endif]-->
+        <!--[if !mso]><!-->
+        #{button_html}
+        <!--<![endif]-->
+      MSO
+      # Final container div with class for primary CSS styling
+      parts << %(<div class="goodmail-button" style="text-align: center; margin: 24px 0;">#{mso_wrapper.strip.html_safe}</div>)
     end
 
     def image(src, alt = "", width: nil, height: nil)
-      style = "max-width:100%; height:auto;"
+      alt_text = alt.present? ? alt : Goodmail.config.company_name # Default alt text
+      style = "max-width:100%; height:auto; display: block; margin: 0 auto;"
       style += " width:#{width}px;" if width
       style += " height:#{height}px;" if height
-      # Use a class for easier styling via layout CSS
-      parts << %(<img class="goodmail-image" src="#{h src}" alt="#{h alt}" style="#{style}">)
+      # Standard image tag
+      img_tag = %(<img class="goodmail-image" src="#{h src}" alt="#{h alt_text}" style="#{style}">)
+      # MSO conditional wrapper for centering
+      mso_wrapper = <<~MSO
+        <!--[if mso]>
+        <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" style="border-spacing:0; border-collapse:collapse; mso-table-lspace:0pt; mso-table-rspace:0pt;"><tr><td style="padding: 20px 0;" align="center">
+        <![endif]-->
+        #{img_tag}
+        <!--[if mso]>
+        </td></tr></table>
+        <![endif]-->
+      MSO
+      parts << mso_wrapper.strip.html_safe
+    end
+
+    # Adds a simple price row as a styled paragraph.
+    # NOTE: This does not create a table structure.
+    def price_row(name, price)
+      parts << %(<p style="font-weight:bold; text-align:center; border-top:1px solid #eaeaea; padding:20px 0; margin: 0;">#{h name} &ndash; #{h price}</p>)
+    end
+
+    # Adds a simple code box with background styling.
+    def code_box(text)
+      # Re-added background/padding; content is simple, should survive Premailer plain text.
+      parts << %(<p style="background:#F8F8F8; padding:20px; font-style:italic; text-align:center; color:#404040; margin:16px 0; border-radius: 4px;"><strong>#{h text}</strong></p>)
     end
 
     def space(px = 16)
@@ -52,9 +98,8 @@ module Goodmail
     end
 
     def sign(name = Goodmail.config.company_name)
-      # Directly add the paragraph with the raw styled span
-      # Name is escaped using h() to prevent injection if config is compromised
-      parts << %(<p style="margin:16px 0; line-height: 1.6;"><span style="color: #888;">– #{h name}</span></p>)
+      # Use #777 for better contrast than #888
+      parts << %(<p style="margin:16px 0; line-height: 1.6;"><span style="color: #777;">– #{h name}</span></p>)
     end
 
     %i[h1 h2 h3].each do |heading_tag|

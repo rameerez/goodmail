@@ -25,38 +25,54 @@ bundle install
 
 ## Configuration
 
-You can (and should!) edit the default strings in the Goodmail initializer.
+Goodmail requires minimal configuration to ensure emails look correct. You **must** set at least your `company_name`.
 
-Create an initializer file at `config/initializers/goodmail.rb`:
+Create an initializer file at `config/initializers/goodmail.rb` and configure the options:
 
 ```ruby
 # config/initializers/goodmail.rb
 
 Goodmail.configure do |config|
-  # The main accent color used for buttons and links in the email body.
-  # Default: "#348eda"
-  config.brand_color = "#E62F17" # Your brand's primary color
+  # --- Basic Branding (Required) --- 
 
-  # The company name displayed in the email footer and used by the default `sign` helper.
-  # Default: "Example Inc."
+  # The company name displayed in the email footer and used by `sign` helper.
+  # NOT OPTIONAL - MUST BE SET
   config.company_name = "MyApp Inc."
 
-  # Optional: URL to your company logo. If set, it will appear centered in the header.
+  # --- Optional Branding --- 
+
+  # The main accent color used for buttons and links in the email body.
+  config.brand_color = "#E62F17"
+
+  # Optional: URL to your company logo. If set, it will appear in the header.
   # Recommended size: max-height 30px.
   # Default: nil
   config.logo_url = "https://cdn.myapp.com/images/email_logo.png"
+
+  # Optional: URL the header logo links to (e.g., your homepage).
+  # Ignored if logo_url is not set. Must be a valid URL (no spaces etc.).
+  # Default: nil
+  config.company_url = "https://myapp.com"
+
+  # --- Optional Email Content Defaults --- 
+
+  # Optional: Default preheader text (appears after subject in inbox preview).
+  # Can be overridden per email via headers[:preheader]. If unset, subject is used.
+  # Default: nil
+  config.default_preheader = "Your account update from MyApp."
+
+  # Optional: Global default URL for unsubscribe links.
+  # Goodmail *does not* handle the unsubscribe logic; you must provide a valid URL.
+  # Can be overridden per email via headers[:unsubscribe_url].
+  # Default: nil
+  config.unsubscribe_url = "https://myapp.com/emails/unsubscribe"
+
+  # --- Optional Footer Customization --- 
 
   # Optional: Custom text displayed in the footer below the copyright.
   # Use this to explain why the user received the email.
   # Default: nil
   config.footer_text = "You are receiving this email because you signed up for an account at MyApp."
-
-  # Optional: Global default URL for unsubscribe links (both the List-Unsubscribe
-  # header and the optional visible link in the footer).
-  # Goodmail *does not* handle the unsubscribe logic; you must provide a valid URL.
-  # Can be overridden per email via headers[:unsubscribe_url].
-  # Default: nil
-  config.unsubscribe_url = "https://myapp.com/emails/unsubscribe"
 
   # Optional: Whether to show a visible unsubscribe link in the footer.
   # Requires an unsubscribe URL to be set (globally or per-email).
@@ -69,23 +85,37 @@ Goodmail.configure do |config|
 end
 ```
 
+*The application will raise an error on startup if required configuration keys (`company_name`) are missing or blank.*
+
 Make sure to restart your Rails server after creating or modifying the initializer.
 
 ## Quick start
 
-Use the `Goodmail.compose` method to compose emails using the DSL, then call `.deliver_now` or `.deliver_later` on it (your usual standard Action Mailer methods)
+Use the `Goodmail.compose` method to compose emails using the DSL, then call `.deliver_now` or `.deliver_later` on it.
 
+### Basic Example (Deliver Now)
 
 ```ruby
-# In a controller action, background job, or service object
-Goodmail.compose(to: user.email, subject: "Welcome!") do
-  text "Hey #{user.first_name},"
-  text     "Thanks for joining. Confirm below:"
-  button   "Confirm account", confirm_url
-end.deliver_now
+# Assumes config/initializers/goodmail.rb is configured!
+recipient = User.find(params[:user_id])
+
+mail = Goodmail.compose(
+  to: recipient.email,
+  from: ""#{Goodmail.config.company_name} Support" <support@myapp.com>",
+  subject: "Welcome to MyApp!",
+  preheader: "Your adventure begins now!" # Optional override
+) do
+  h1 "Welcome aboard, #{recipient.name}!"
+  text "We're thrilled to have you join the MyApp community."
+  text "Here are a few things: Check the <a href=\"/help\">Help Center</a>."
+  button "Go to Dashboard", user_dashboard_url(recipient)
+  sign
+end
+
+mail.deliver_now
 ```
 
-You can also call `.deliver_later`:
+### Deliver Later (Background Job)
 
 ```ruby
 mail = Goodmail.compose(
@@ -121,7 +151,6 @@ I thought the same! And that's actually how I started using it. But after using 
 
 So making it into a gem with a simple DSL was my solution to solve this email HTML mess.
 
-
 ## Usage
 
 ### Available DSL Methods
@@ -129,47 +158,46 @@ So making it into a gem with a simple DSL was my solution to solve this email HT
 Inside the `Goodmail.compose` block, you have access to these methods:
 
 *   `h1(text)`, `h2(text)`, `h3(text)`: Styled heading tags.
-*   `text(string)`: A paragraph of text. Handles `\n` for line breaks. Allows simple inline `<a>` tags with `href` attributes; other HTML is stripped for safety.
-*   `button(link_text, url)`: A prominent, styled call-to-action button.
-*   `image(src, alt = "", width: nil, height: nil)`: Embeds an image, centered by default.
+*   `text(string)`: A paragraph of text. Allows simple inline `<a>` tags with `href` attributes; other HTML is stripped for safety. Handles `\n` for line breaks.
+*   `button(link_text, url)`: A prominent, styled call-to-action button (includes Outlook VML fallback).
+*   `image(src, alt = "", width: nil, height: nil)`: Embeds an image, centered by default (includes Outlook MSO fallback). Uses `config.company_name` for alt text if none provided.
 *   `space(pixels = 16)`: Adds vertical whitespace.
 *   `line`: Adds a horizontal rule (`<hr>`).
 *   `center { ... }`: Centers the content generated within the block.
+*   `code_box(text)`: Displays text centered and bold within a styled box (grey background, padding, italic). Text is HTML-escaped.
+*   `price_row(name, price)`: Adds a styled paragraph showing a name and price, separated by a top border (e.g., for simple receipt line items). Text is HTML-escaped.
 *   `sign(name = Goodmail.config.company_name)`: Adds a standard closing signature line.
-*   `html(raw_html_string)`: **Use with extreme caution.** Allows embedding raw, *un-sanitized* HTML. Only use this if you absolutely trust the source of the string.
+*   `html(raw_html_string)`: **Use with extreme caution.** Allows embedding raw, *un-sanitized* HTML.
 
 ### Adding Unsubscribe Functionality
 
-Goodmail helps you add the `List-Unsubscribe` header and an optional visible link, but **you must provide the actual URL** where users can unsubscribe. Goodmail does not generate unsubscribe URLs or handle the logic.
+Goodmail helps you add the `List-Unsubscribe` header and an optional visible link, but **you must provide the actual URL** where users can unsubscribe.
 
-1.  **Provide the URL:** You have two options:
-    *   **Globally:** Set `config.unsubscribe_url = "your_global_url"` in the initializer (`config/initializers/goodmail.rb`).
-    *   **Per-Email:** Pass `unsubscribe_url: "your_specific_url"` in the headers hash when calling `Goodmail.compose`. This overrides the global setting for that email.
+1.  **Provide the URL:**
+    *   **Globally:** Set `config.unsubscribe_url = "your_global_url"`.
+    *   **Per-Email:** Pass `unsubscribe_url: "your_specific_url"` in the headers hash. This overrides the global setting.
 
     ```ruby
-    # Example using per-email override
     mail = Goodmail.compose(
       to: recipient.email,
+      unsubscribe_url: manage_subscription_url(recipient),
       # ... other headers ...
-      unsubscribe_url: manage_subscription_url(recipient) # Your app's URL helper
-    ) do
-      # ... email content ...
-    end
+    ) do # ...
     ```
-    *If an `unsubscribe_url` is provided (either globally or per-email), Goodmail will automatically add the standard `List-Unsubscribe` header.*
+    *If an `unsubscribe_url` is provided, Goodmail adds the `List-Unsubscribe` header.*
 
 2.  **Optionally Show Footer Link:**
-    *   To show a visible link in the email footer, set `config.show_footer_unsubscribe_link = true` in the initializer.
-    *   You can customize the link text with `config.footer_unsubscribe_link_text` (default: "Unsubscribe").
-    *   *Note: The footer link only appears if an `unsubscribe_url` was provided (step 1) AND `config.show_footer_unsubscribe_link` is true.* 
+    *   Set `config.show_footer_unsubscribe_link = true`.
+    *   Customize `config.footer_unsubscribe_link_text`.
+    *   *The footer link only appears if an `unsubscribe_url` was provided AND `config.show_footer_unsubscribe_link` is true.* 
 
     ```ruby
     # config/initializers/goodmail.rb
     Goodmail.configure do |config|
-      # ... other settings
       config.unsubscribe_url = "https://myapp.com/preferences"
       config.show_footer_unsubscribe_link = true
       config.footer_unsubscribe_link_text = "Manage email preferences"
+      # ...
     end
     ```
 

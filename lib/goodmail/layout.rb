@@ -16,8 +16,9 @@ module Goodmail
     # @param subject [String] The email subject line (used for the <title> tag).
     # @param layout_path [String, nil] Optional path to a custom layout ERB file.
     # @param unsubscribe_url [String, nil] Optional URL for the footer unsubscribe link.
+    # @param preheader [String, nil] Optional preheader text.
     # @return [String] The full HTML document string.
-    def render(body_html, subject, layout_path: nil, unsubscribe_url: nil)
+    def render(body_html, subject, layout_path: nil, unsubscribe_url: nil, preheader: nil)
       template_path = layout_path || DEFAULT_LAYOUT_PATH
 
       unless File.exist?(template_path)
@@ -31,7 +32,8 @@ module Goodmail
         body_html:       body_html,
         subject:         subject || "",
         config:          Goodmail.config, # Make config available
-        unsubscribe_url: unsubscribe_url  # Pass unsubscribe URL to template
+        unsubscribe_url: unsubscribe_url,  # Pass unsubscribe URL to template
+        preheader:       preheader # Pass preheader to template
       )
     rescue => e
       raise Goodmail::Error, "Failed to render layout template: #{e.message}"

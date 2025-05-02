@@ -9,32 +9,33 @@ module Goodmail
       brand_color:  "#348eda",
       company_name: "Example Inc.",
       logo_url:     nil,
+      # Optional: URL the header logo links to.
+      company_url:  nil,
+      # Optional: Global default unsubscribe URL.
+      unsubscribe_url: nil,
+      # Optional: Default preheader text (appears after subject in inbox preview).
+      default_preheader: nil,
       # Optional footer text (e.g., "Why you received this email")
       footer_text:  nil,
-      # Optional: Global default unsubscribe URL.
-      # Can be overridden per email via headers[:unsubscribe_url].
-      # User is responsible for providing a valid URL to manage email subscriptions.
-      unsubscribe_url: nil,
       # Show a visible unsubscribe link in the footer?
       show_footer_unsubscribe_link: false,
       # Text for the footer unsubscribe link
       footer_unsubscribe_link_text: "Unsubscribe"
     ).freeze # Freeze the default object to prevent accidental modification
 
+    # Define required keys that MUST be set by the user (cannot be nil/empty)
+    REQUIRED_CONFIG_KEYS = %i[company_name].freeze
+
     # Provides the configuration block helper.
-    # Allows users to modify the configuration in an initializer:
-    #   Goodmail.configure do |config|
-    #     config.brand_color = "#ff0000"
-    #   end
+    # Ensures validation runs after the block is executed.
     def configure
-      # Ensure config is initialized before yielding
-      yield config
+      yield config # Ensures config is initialized via accessor
+      validate_config!(config)
     end
 
     # Returns the current configuration object.
     # Initializes with a copy of the defaults if not already configured.
     def config
-      # Use defined? check for more robust initialization in edge cases
       @config = DEFAULT_CONFIG.dup unless defined?(@config) && @config
       @config
     end
@@ -45,6 +46,21 @@ module Goodmail
       @config = nil
     end
 
-    # Removed attr_reader/writer - relying on explicit config method.
+    private
+
+    # Validates that required configuration keys are set.
+    # Raises Goodmail::Error if any required keys are missing or blank.
+    def validate_config!(current_config)
+      missing_keys = REQUIRED_CONFIG_KEYS.select do |key|
+        value = current_config[key]
+        value.nil? || (value.respond_to?(:strip) && value.strip.empty?)
+      end
+
+      unless missing_keys.empty?
+        raise Goodmail::Error, "Missing required Goodmail configuration keys: #{missing_keys.join(', ')}. Please set them in config/initializers/goodmail.rb"
+      end
+
+      # Optional: Add validation for URL formats if needed
+    end
   end
 end
