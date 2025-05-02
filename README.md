@@ -1,5 +1,5 @@
 # 💌 Goodmail - Make your Rails SaaS transactional emails look beautiful
-[![Gem Version](https://badge.fury.io/rb/pay.svg)](https://badge.fury.io/rb/pay)
+[![Gem Version](https://badge.fury.io/rb/goodmail.svg)](https://badge.fury.io/rb/goodmail)
 
 Send beautiful, simple transactional emails with zero HTML hell.
 
