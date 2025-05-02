@@ -8,8 +8,8 @@ Gem::Specification.new do |spec|
   spec.authors = ["rameerez"]
   spec.email = ["rubygems@rameerez.com"]
 
-  spec.summary = "Drop in, call Goodmail.email, ship decent emails."
-  spec.description = "A minimal, expressive Ruby DSL for sending beautiful, production-grade transactional emails in Rails apps — no templates, no partials, no HTML string soup."
+  spec.summary = "Make your transactional emails look beautiful"
+  spec.description = "Send beautiful, simple transactional emails with zero HTML hell. Goodmail is a minimal, opinionated, expressive Ruby DSL for sending production-grade transactional emails in Rails apps that look good in any email client out of the box."
 
   spec.homepage = "https://github.com/rameerez/goodmail"
   spec.license = "MIT"

@@ -1,4 +1,4 @@
-# Goodmail
+# 💌 Goodmail - Make your transactional emails look beautiful
 [![Gem Version](https://badge.fury.io/rb/pay.svg)](https://badge.fury.io/rb/pay)
 
 Send beautiful, simple transactional emails with zero HTML hell.
@@ -75,31 +75,15 @@ Make sure to restart your Rails server after creating or modifying the initializ
 
 Use the `Goodmail.compose` method to compose emails using the DSL, then call `.deliver_now` or `.deliver_later` on it (your usual standard Action Mailer methods)
 
-### Basic Example (Deliver Now)
+### Basic Example
 
 ```ruby
 # In a controller action, background job, or service object
-
-recipient = User.find(params[:user_id])
-
-mail = Goodmail.compose(
-  to: recipient.email,
-  from: ""MyApp Support" <support@myapp.com>",
-  subject: "Welcome to MyApp!"
-  # No unsubscribe header or link for this email
-) do
-  h1 "Welcome aboard, #{recipient.name}!"
-  text "We're thrilled to have you join the MyApp community."
-  # You can include safe inline links directly in text blocks:
-  text "Here are a few things to get you started: Check the <a href=\"/help\">Help Center</a>."
-  text "- Complete your profile\n- Explore the dashboard\n- Invite your team"
-  button "Go to Dashboard", user_dashboard_url(recipient) # Use Rails URL helpers
-  space # Adds default vertical space
-  text "Need help? Just reply to this email."
-  sign # Adds "– #{Goodmail.config.company_name}"
-end
-
-mail.deliver_now
+Goodmail.compose(to: user.email, subject: "Welcome!") do
+  greeting "Hey #{user.first_name},"
+  text     "Thanks for joining. Confirm below:"
+  button   "Confirm account", confirm_url
+end.deliver_now
 ```
 
 ### Deliver Later (Background Job)
