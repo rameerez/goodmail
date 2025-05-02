@@ -3,9 +3,11 @@
 
 Send beautiful, simple transactional emails with zero HTML hell.
 
-Goodmail turns your ugly, default, text-only emails into SaaS-ready emails. It's an opinionated, minimal, expressive Ruby DSL for sending beautiful, production-grade transactional emails in Rails apps — no templates, no partials, no HTML hell.
+Goodmail turns your ugly, default, text-only emails into SaaS-ready emails. It's an opinionated, minimal, expressive Ruby DSL for sending beautiful, production-grade transactional emails in Rails apps — no templates, no partials, no HTML hell. The template works well and looks nice across email clients.
 
-There's only one template. You can't change it. You're guaranteed you'll send good emails, but the cost is you don't have much flexibility. If you're okay with this, welcome to `goodmail`! You'll be shipping decent emails that look great everywhere in no time.
+Here's the catch: there's only one template. You can't change it. You're guaranteed you'll send good emails, but the cost is you don't have much flexibility. If you're okay with this, welcome to `goodmail`! You'll be shipping decent emails that look great everywhere in no time.
+
+(And you can still use Action Mailer for all other template-intensive emails – Goodmail doesn't replace Action Mailer, just builds on top of it!)
 
 ## Installation
 
@@ -71,7 +73,7 @@ Make sure to restart your Rails server after creating or modifying the initializ
 
 ## Quick start
 
-The primary way to use Goodmail is via the `Goodmail.compose` method. It builds and returns a `Mail::Message` object, which you can then deliver using standard Action Mailer methods.
+Use the `Goodmail.compose` method to compose emails using the DSL, then call `.deliver_now` or `.deliver_later` on it (your usual standard Action Mailer methods)
 
 ### Basic Example (Deliver Now)
 
