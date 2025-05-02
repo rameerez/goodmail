@@ -28,7 +28,7 @@ module Goodmail
         unsubscribe_url: unsubscribe_url # Pass determined URL to layout renderer
       )
 
-      # 5. Generate plaintext version
+      # 5. Generate plaintext version from the Builder's raw HTML output
       text_body = generate_plaintext(builder.html_output)
 
       # 6. Slice standard headers for the mailer action
@@ -66,6 +66,11 @@ module Goodmail
       text = CGI.unescapeHTML(text)
       # Convert links: Link Text ( URL )
       text.gsub!(%r{<a[^>]*href=\"([^\"]*)\"[^>]*>(.*?)</a>}i) { "#{$2.strip} ( #{$1.strip} )" }
+      # Convert images to [Image: Alt Text]
+      text.gsub!(%r{<img[^>]*alt=\"([^\"]*)\"[^>]*>}i) do
+        alt_text = $1.strip
+        alt_text.empty? ? "[Image]" : "[Image: #{alt_text}]"
+      end
       # Replace block elements and <br> with double newlines for spacing
       text.gsub!(%r{</?(p|h[1-6]|ul|ol|li|div|tr|table|hr)[^>]*>}i, "\n\n")
       text.gsub!(%r{<br\s*/?>}i, "\n\n")
