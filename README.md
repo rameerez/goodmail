@@ -90,8 +90,8 @@ mail = Goodmail.compose(
 ) do
   h1 "Welcome aboard, #{recipient.name}!"
   text "We're thrilled to have you join the MyApp community."
-  text "Here are a few things to get you started:"
-  # You can use simple lists within text blocks:
+  # You can include safe inline links directly in text blocks:
+  text "Here are a few things to get you started: Check the <a href=\"/help\">Help Center</a>."
   text "- Complete your profile\n- Explore the dashboard\n- Invite your team"
   button "Go to Dashboard", user_dashboard_url(recipient) # Use Rails URL helpers
   space # Adds default vertical space
@@ -123,14 +123,14 @@ mail.deliver_later
 Inside the `Goodmail.compose` block, you have access to these methods:
 
 *   `h1(text)`, `h2(text)`, `h3(text)`: Styled heading tags.
-*   `text(string)`: A paragraph of text. Handles `\n` for line breaks within the paragraph.
+*   `text(string)`: A paragraph of text. Handles `\n` for line breaks. Allows simple inline `<a>` tags with `href` attributes; other HTML is stripped for safety.
 *   `button(link_text, url)`: A prominent, styled call-to-action button.
 *   `image(src, alt = "", width: nil, height: nil)`: Embeds an image, centered by default.
 *   `space(pixels = 16)`: Adds vertical whitespace.
 *   `line`: Adds a horizontal rule (`<hr>`).
 *   `center { ... }`: Centers the content generated within the block.
 *   `sign(name = Goodmail.config.company_name)`: Adds a standard closing signature line.
-*   `html(raw_html_string)`: **Use with caution.** Allows embedding raw HTML. Useful for complex cases or escaping the DSL, but bypasses standard formatting.
+*   `html(raw_html_string)`: **Use with extreme caution.** Allows embedding raw, *un-sanitized* HTML. Only use this if you absolutely trust the source of the string.
 
 ### Adding Unsubscribe Functionality
 
