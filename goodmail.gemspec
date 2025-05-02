@@ -11,12 +11,12 @@ Gem::Specification.new do |spec|
   spec.summary = "Drop in, call Goodmail.email, ship decent emails."
   spec.description = "A minimal, expressive Ruby DSL for sending beautiful, production-grade transactional emails in Rails apps — no templates, no partials, no HTML string soup."
 
-  spec.homepage = "https://github.com/rameerez/api_keys"
+  spec.homepage = "https://github.com/rameerez/goodmail"
   spec.license = "MIT"
   spec.required_ruby_version = ">= 3.1.0"
 
   spec.metadata["allowed_push_host"] = "https://rubygems.org"
-  spec.metadata["homepage_uri"] = "https://apikeys.rameerez.com"
+  spec.metadata["homepage_uri"] = "https://github.com/rameerez/goodmail"
   spec.metadata["source_code_uri"] = spec.homepage
   spec.metadata["changelog_uri"] = "#{spec.homepage}/blob/main/CHANGELOG.md"
   spec.metadata["rubygems_mfa_required"] = "true"
