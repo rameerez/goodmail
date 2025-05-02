@@ -6,6 +6,9 @@ module Goodmail
   # Builds the HTML content string based on DSL method calls.
   class Builder
     include ERB::Util # For the h() helper
+    # The h helper, included from ERB::Util, stands for html_escape.
+    # It converts special characters (&, <, >, ", ') into their HTML entity equivalents (&amp;, &lt;, &gt;, &quot;, &#39;). This prevents Cross-Site Scripting (XSS) by ensuring dynamic content is displayed as literal text rather than being interpreted as HTML.
+
 
     # Initialize a basic sanitizer allowing only <a> tags with href
     HTML_SANITIZER = Rails::Html::SafeListSanitizer.new
@@ -83,7 +86,7 @@ module Goodmail
     # Adds a simple price row as a styled paragraph.
     # NOTE: This does not create a table structure.
     def price_row(name, price)
-      parts << %(<p style="font-weight:bold; text-align:center; border-top:1px solid #eaeaea; padding:20px 0; margin: 0;">#{h name} &ndash; #{h price}</p>)
+      parts << %(<p style="font-family: 'Helvetica Neue',Helvetica,Arial,sans-serif; font-size: 14px; font-weight:bold; text-align:center; border-top:1px solid #eaeaea; padding:14px 0; margin: 0;">#{h name} &nbsp; &ndash; &nbsp; #{h price}</p>)
     end
 
     # Adds a simple code box with background styling.
