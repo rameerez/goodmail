@@ -7,6 +7,8 @@ Goodmail turns your ugly, default, text-only emails into SaaS-ready emails. It's
 
 ![Goodmail Example Email](mailgood.webp)
 
+You can easily add buttons, images, links, price lines, and text to your emails, and it'll look good everywhere, no styling needed.
+
 Here's the catch: there's only one template. You can't change it. You're guaranteed you'll send good emails, but the cost is you don't have much flexibility. If you're okay with this, welcome to `goodmail`! You'll be shipping decent emails that look great everywhere in no time.
 
 (And you can still use Action Mailer for all other template-intensive emails – Goodmail doesn't replace Action Mailer, just builds on top of it!)
