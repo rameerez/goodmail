@@ -104,7 +104,7 @@ recipient = User.find(params[:user_id])
 
 mail = Goodmail.compose(
   to: recipient.email,
-  from: ""#{Goodmail.config.company_name} Support" <support@myapp.com>",
+  from: "'#{Goodmail.config.company_name} Support' <support@myapp.com>",
   subject: "Welcome to MyApp!",
   preheader: "Your adventure begins now!" # Optional override
 ) do
