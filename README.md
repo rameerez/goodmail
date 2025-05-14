@@ -172,6 +172,68 @@ Inside the `Goodmail.compose` block, you have access to these methods:
 *   `sign(name = Goodmail.config.company_name)`: Adds a standard closing signature line.
 *   `html(raw_html_string)`: **Use with extreme caution.** Allows embedding raw, *un-sanitized* HTML.
 
+### Advanced: Rendering Email Parts with `Goodmail.render`
+
+For more advanced use cases, such as integrating Goodmail's content generation into existing mailer workflows (like Devise mailers) or when you need direct access to the generated HTML and plain text parts before sending, Goodmail provides the `Goodmail.render` method.
+
+This method processes your DSL block, applies the layout, runs Premailer for CSS inlining, and performs plain text cleanup, similar to `Goodmail.compose`. However, instead of returning a `Mail::Message` object ready for delivery, it returns a `Goodmail::EmailParts` struct.
+
+The `Goodmail::EmailParts` struct (defined in `goodmail/email.rb`) has two attributes:
+*   `html`: The final, inlined HTML content for your email.
+*   `text`: The cleaned-up plain text version of your email.
+
+**How to use it:**
+
+You can then use these parts within any Action Mailer setup:
+
+```ruby
+# In your custom mailer (e.g., a Devise mailer override)
+
+# Define your headers (to, from, subject, etc.)
+# The :subject is crucial for Goodmail.render.
+# You can also pass :unsubscribe_url and :preheader to Goodmail.render
+# to override global configurations for that specific email.
+# Note: these Goodmail-specific keys will be used by Goodmail.render
+# and should not be passed directly to ActionMailer's mail() method
+# if they are not standard mail headers.
+mail_rendering_headers = {
+  to: recipient.email,
+  from: "notifications@myapp.com",
+  subject: "Important Update for #{recipient.name}",
+  unsubscribe_url: custom_unsubscribe_url_for_user(recipient), # Optional
+  preheader: "A quick update you should see." # Optional
+}
+
+# Render the email parts using Goodmail's DSL
+# Goodmail.render will use :subject, :unsubscribe_url, :preheader internally.
+parts = Goodmail.render(mail_rendering_headers) do
+  h1 "Hello, #{recipient.name}!"
+  text "This is an important update regarding your account."
+  button "View Details", view_details_url(recipient)
+  sign "The MyApp Team"
+end
+
+# Prepare headers for ActionMailer's mail() method,
+# ensuring only standard mail headers are passed.
+action_mailer_headers = mail_rendering_headers.slice(:to, :from, :subject, :cc, :bcc, :reply_to)
+
+# Now use these parts in ActionMailer's mail method
+# You might also want to add the List-Unsubscribe header manually here if needed.
+final_mail_object = mail(action_mailer_headers) do |format|
+  format.html { render html: parts.html.html_safe }
+  format.text { render plain: parts.text }
+end
+
+# The `final_mail_object` returned by ActionMailer can then be delivered:
+# final_mail_object.deliver_now or final_mail_object.deliver_later
+```
+
+**Key Differences from `Goodmail.compose`:**
+
+*   **Return Value**: `Goodmail.render` returns an instance of `Goodmail::EmailParts` (e.g., `EmailParts.new(html: "...", text: "...")`). `Goodmail.compose` returns a `Mail::Message` object.
+*   **Purpose**: `Goodmail.render` is primarily for generating and retrieving processed email content parts. `Goodmail.compose` is for generating a complete, deliverable `Mail::Message` object.
+*   **List-Unsubscribe Header**: `Goodmail.render` itself does *not* add the `List-Unsubscribe` header to any mail object (as it doesn't create one). If you use `Goodmail.render`, you are responsible for adding this header to your `Mail::Message` object if an `unsubscribe_url` was effectively used during rendering (either passed to `Goodmail.render` or taken from global config) and you require this header. The internal `Goodmail::Mailer` (used by `Goodmail.compose`) handles adding this header automatically to the `Mail::Message` object it builds.
+
 ### Adding Unsubscribe Functionality
 
 Goodmail helps you add the `List-Unsubscribe` header and an optional visible link, but **you must provide the actual URL** where users can unsubscribe.

@@ -10,6 +10,7 @@ require_relative "goodmail/configuration"
 require_relative "goodmail/error" # Load Error class explicitly if needed elsewhere
 require_relative "goodmail/builder"
 require_relative "goodmail/layout"
+require_relative "goodmail/email"
 require_relative "goodmail/mailer"     # Require the internal Mailer
 require_relative "goodmail/dispatcher"
 
