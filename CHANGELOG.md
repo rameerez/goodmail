@@ -1,3 +1,6 @@
+## [0.3.0] - 2025-05-15
+- Add Goodmail.render for custom mailers
+
 ## [0.2.0] - 2025-05-02
 
 ### Added
