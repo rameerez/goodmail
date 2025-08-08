@@ -1,0 +1,620 @@
+append_cflags: checking for whether -std=c99 is accepted as CFLAGS... -------------------- yes
+
+LD_LIBRARY_PATH=.:/usr/lib/x86_64-linux-gnu "x86_64-linux-gnu-gcc -o conftest -I/usr/include/x86_64-linux-gnu/ruby-3.3.0 -I/usr/include/ruby-3.3.0/ruby/backward -I/usr/include/ruby-3.3.0 -I. -Wdate-time -D_FORTIFY_SOURCE=3   -g -O3 -Werror=implicit-function-declaration -fno-omit-frame-pointer -mno-omit-leaf-frame-pointer -ffile-prefix-map=BUILDDIR=. -fstack-protector-strong -fstack-clash-protection -Wformat -Werror=format-security -fcf-protection -fdebug-prefix-map=BUILDDIR=/usr/src/ruby3.3-3.3.7-1ubuntu2 -fPIC conftest.c  -L. -L/usr/lib/x86_64-linux-gnu -L. -Wl,-Bsymbolic-functions -Wl,-z,relro -Wl,-z,now -fstack-protector-strong -rdynamic -Wl,-export-dynamic -Wl,--no-as-needed     -lruby-3.3  -lm -lpthread  -lc"
+checked program was:
+/* begin */
+1: #include "ruby.h"
+2: 
+3: int main(int argc, char **argv)
+4: {
+5:   return !!argv[argc];
+6: }
+/* end */
+
+LD_LIBRARY_PATH=.:/usr/lib/x86_64-linux-gnu "x86_64-linux-gnu-gcc -I/usr/include/x86_64-linux-gnu/ruby-3.3.0 -I/usr/include/ruby-3.3.0/ruby/backward -I/usr/include/ruby-3.3.0 -I. -Wdate-time -D_FORTIFY_SOURCE=3   -g -O3 -Werror=implicit-function-declaration -fno-omit-frame-pointer -mno-omit-leaf-frame-pointer -ffile-prefix-map=BUILDDIR=. -fstack-protector-strong -fstack-clash-protection -Wformat -Werror=format-security -fcf-protection -fdebug-prefix-map=BUILDDIR=/usr/src/ruby3.3-3.3.7-1ubuntu2 -fPIC  -std=c99 -Werror -c conftest.c"
+checked program was:
+/* begin */
+1: #include "ruby.h"
+2: 
+3: int main(int argc, char **argv)
+4: {
+5:   return !!argv[argc];
+6: }
+/* end */
+
+--------------------
+
+append_cflags: checking for whether -Wno-declaration-after-statement is accepted as CFLAGS... -------------------- yes
+
+LD_LIBRARY_PATH=.:/usr/lib/x86_64-linux-gnu "x86_64-linux-gnu-gcc -I/usr/include/x86_64-linux-gnu/ruby-3.3.0 -I/usr/include/ruby-3.3.0/ruby/backward -I/usr/include/ruby-3.3.0 -I. -Wdate-time -D_FORTIFY_SOURCE=3   -g -O3 -Werror=implicit-function-declaration -fno-omit-frame-pointer -mno-omit-leaf-frame-pointer -ffile-prefix-map=BUILDDIR=. -fstack-protector-strong -fstack-clash-protection -Wformat -Werror=format-security -fcf-protection -fdebug-prefix-map=BUILDDIR=/usr/src/ruby3.3-3.3.7-1ubuntu2 -fPIC -std=c99  -Wno-declaration-after-statement -Werror -c conftest.c"
+checked program was:
+/* begin */
+1: #include "ruby.h"
+2: 
+3: int main(int argc, char **argv)
+4: {
+5:   return !!argv[argc];
+6: }
+/* end */
+
+--------------------
+
+append_cflags: checking for whether -O2 is accepted as CFLAGS... -------------------- yes
+
+LD_LIBRARY_PATH=.:/usr/lib/x86_64-linux-gnu "x86_64-linux-gnu-gcc -I/usr/include/x86_64-linux-gnu/ruby-3.3.0 -I/usr/include/ruby-3.3.0/ruby/backward -I/usr/include/ruby-3.3.0 -I. -Wdate-time -D_FORTIFY_SOURCE=3   -g -O3 -Werror=implicit-function-declaration -fno-omit-frame-pointer -mno-omit-leaf-frame-pointer -ffile-prefix-map=BUILDDIR=. -fstack-protector-strong -fstack-clash-protection -Wformat -Werror=format-security -fcf-protection -fdebug-prefix-map=BUILDDIR=/usr/src/ruby3.3-3.3.7-1ubuntu2 -fPIC -std=c99 -Wno-declaration-after-statement  -O2 -Werror -c conftest.c"
+checked program was:
+/* begin */
+1: #include "ruby.h"
+2: 
+3: int main(int argc, char **argv)
+4: {
+5:   return !!argv[argc];
+6: }
+/* end */
+
+--------------------
+
+append_cflags: checking for whether -g is accepted as CFLAGS... -------------------- yes
+
+LD_LIBRARY_PATH=.:/usr/lib/x86_64-linux-gnu "x86_64-linux-gnu-gcc -I/usr/include/x86_64-linux-gnu/ruby-3.3.0 -I/usr/include/ruby-3.3.0/ruby/backward -I/usr/include/ruby-3.3.0 -I. -Wdate-time -D_FORTIFY_SOURCE=3   -g -O3 -Werror=implicit-function-declaration -fno-omit-frame-pointer -mno-omit-leaf-frame-pointer -ffile-prefix-map=BUILDDIR=. -fstack-protector-strong -fstack-clash-protection -Wformat -Werror=format-security -fcf-protection -fdebug-prefix-map=BUILDDIR=/usr/src/ruby3.3-3.3.7-1ubuntu2 -fPIC -std=c99 -Wno-declaration-after-statement -O2  -g -Werror -c conftest.c"
+checked program was:
+/* begin */
+1: #include "ruby.h"
+2: 
+3: int main(int argc, char **argv)
+4: {
+5:   return !!argv[argc];
+6: }
+/* end */
+
+--------------------
+
+append_cflags: checking for whether -Winline is accepted as CFLAGS... -------------------- yes
+
+LD_LIBRARY_PATH=.:/usr/lib/x86_64-linux-gnu "x86_64-linux-gnu-gcc -I/usr/include/x86_64-linux-gnu/ruby-3.3.0 -I/usr/include/ruby-3.3.0/ruby/backward -I/usr/include/ruby-3.3.0 -I. -Wdate-time -D_FORTIFY_SOURCE=3   -g -O3 -Werror=implicit-function-declaration -fno-omit-frame-pointer -mno-omit-leaf-frame-pointer -ffile-prefix-map=BUILDDIR=. -fstack-protector-strong -fstack-clash-protection -Wformat -Werror=format-security -fcf-protection -fdebug-prefix-map=BUILDDIR=/usr/src/ruby3.3-3.3.7-1ubuntu2 -fPIC -std=c99 -Wno-declaration-after-statement -O2 -g  -Winline -Werror -c conftest.c"
+checked program was:
+/* begin */
+1: #include "ruby.h"
+2: 
+3: int main(int argc, char **argv)
+4: {
+5:   return !!argv[argc];
+6: }
+/* end */
+
+--------------------
+
+append_cflags: checking for whether -Wmissing-noreturn is accepted as CFLAGS... -------------------- yes
+
+LD_LIBRARY_PATH=.:/usr/lib/x86_64-linux-gnu "x86_64-linux-gnu-gcc -I/usr/include/x86_64-linux-gnu/ruby-3.3.0 -I/usr/include/ruby-3.3.0/ruby/backward -I/usr/include/ruby-3.3.0 -I. -Wdate-time -D_FORTIFY_SOURCE=3   -g -O3 -Werror=implicit-function-declaration -fno-omit-frame-pointer -mno-omit-leaf-frame-pointer -ffile-prefix-map=BUILDDIR=. -fstack-protector-strong -fstack-clash-protection -Wformat -Werror=format-security -fcf-protection -fdebug-prefix-map=BUILDDIR=/usr/src/ruby3.3-3.3.7-1ubuntu2 -fPIC -std=c99 -Wno-declaration-after-statement -O2 -g -Winline  -Wmissing-noreturn -Werror -c conftest.c"
+checked program was:
+/* begin */
+1: #include "ruby.h"
+2: 
+3: int main(int argc, char **argv)
+4: {
+5:   return !!argv[argc];
+6: }
+/* end */
+
+--------------------
+
+append_cflags: checking for whether -Wconversion is accepted as CFLAGS... -------------------- no
+
+LD_LIBRARY_PATH=.:/usr/lib/x86_64-linux-gnu "x86_64-linux-gnu-gcc -I/usr/include/x86_64-linux-gnu/ruby-3.3.0 -I/usr/include/ruby-3.3.0/ruby/backward -I/usr/include/ruby-3.3.0 -I. -Wdate-time -D_FORTIFY_SOURCE=3   -g -O3 -Werror=implicit-function-declaration -fno-omit-frame-pointer -mno-omit-leaf-frame-pointer -ffile-prefix-map=BUILDDIR=. -fstack-protector-strong -fstack-clash-protection -Wformat -Werror=format-security -fcf-protection -fdebug-prefix-map=BUILDDIR=/usr/src/ruby3.3-3.3.7-1ubuntu2 -fPIC -std=c99 -Wno-declaration-after-statement -O2 -g -Winline -Wmissing-noreturn  -Wconversion -Werror -c conftest.c"
+In file included from /usr/include/ruby-3.3.0/ruby/internal/arithmetic/long.h:42,
+                 from /usr/include/ruby-3.3.0/ruby/internal/arithmetic/int.h:26,
+                 from /usr/include/ruby-3.3.0/ruby/internal/arithmetic/char.h:23,
+                 from /usr/include/ruby-3.3.0/ruby/internal/arithmetic.h:24,
+                 from /usr/include/ruby-3.3.0/ruby/ruby.h:28,
+                 from /usr/include/ruby-3.3.0/ruby.h:38,
+                 from conftest.c:1:
+/usr/include/ruby-3.3.0/ruby/internal/special_consts.h: In function ‘RB_TEST’:
+/usr/include/ruby-3.3.0/ruby/internal/special_consts.h:159:16: error: unsigned conversion from ‘int’ to ‘VALUE’ {aka ‘long unsigned int’} changes value from ‘-5’ to ‘18446744073709551611’ [-Werror=sign-conversion]
+  159 |     return obj & ~RUBY_Qnil;
+      |                ^
+/usr/include/ruby-3.3.0/ruby/internal/special_consts.h: In function ‘RB_NIL_OR_UNDEF_P’:
+/usr/include/ruby-3.3.0/ruby/internal/special_consts.h:229:24: error: unsigned conversion from ‘int’ to ‘VALUE’ {aka ‘const long unsigned int’} changes value from ‘-33’ to ‘18446744073709551583’ [-Werror=sign-conversion]
+  229 |     const VALUE mask = ~(RUBY_Qundef ^ RUBY_Qnil);
+      |                        ^
+/usr/include/ruby-3.3.0/ruby/internal/arithmetic/long.h: In function ‘RB_INT2FIX’:
+/usr/include/ruby-3.3.0/ruby/internal/arithmetic/long.h:117:29: error: conversion to ‘long unsigned int’ from ‘long int’ may change the sign of the result [-Werror=sign-conversion]
+  117 |     const unsigned long j = i;
+      |                             ^
+/usr/include/ruby-3.3.0/ruby/internal/arithmetic/long.h:119:29: error: conversion to ‘long int’ from ‘long unsigned int’ may change the sign of the result [-Werror=sign-conversion]
+  119 |     const long          l = k;
+      |                             ^
+/usr/include/ruby-3.3.0/ruby/internal/arithmetic/long.h:121:29: error: conversion to ‘VALUE’ {aka ‘const long unsigned int’} from ‘long int’ may change the sign of the result [-Werror=sign-conversion]
+  121 |     const VALUE         n = m;
+      |                             ^
+/usr/include/ruby-3.3.0/ruby/internal/arithmetic/long.h: In function ‘rbimpl_fix2long_by_idiv’:
+/usr/include/ruby-3.3.0/ruby/internal/arithmetic/long.h:169:28: error: conversion to ‘long int’ from ‘VALUE’ {aka ‘long unsigned int’} may change the sign of the result [-Werror=sign-conversion]
+  169 |     const SIGNED_VALUE y = x - RUBY_FIXNUM_FLAG;
+      |                            ^
+/usr/include/ruby-3.3.0/ruby/internal/arithmetic/long.h: In function ‘rbimpl_fix2long_by_shift’:
+/usr/include/ruby-3.3.0/ruby/internal/arithmetic/long.h:196:28: error: conversion to ‘long int’ from ‘VALUE’ {aka ‘long unsigned int’} may change the sign of the result [-Werror=sign-conversion]
+  196 |     const SIGNED_VALUE y = x;
+      |                            ^
+/usr/include/ruby-3.3.0/ruby/internal/arithmetic/long.h: In function ‘rb_fix2ulong’:
+/usr/include/ruby-3.3.0/ruby/internal/arithmetic/long.h:255:12: error: conversion to ‘long unsigned int’ from ‘long int’ may change the sign of the result [-Werror=sign-conversion]
+  255 |     return rb_fix2long(x);
+      |            ^~~~~~~~~~~~~~
+/usr/include/ruby-3.3.0/ruby/internal/arithmetic/long.h: In function ‘rb_ulong2num_inline’:
+/usr/include/ruby-3.3.0/ruby/internal/arithmetic/long.h:326:28: error: conversion to ‘long int’ from ‘long unsigned int’ may change the sign of the result [-Werror=sign-conversion]
+  326 |         return RB_LONG2FIX(v);
+      |                            ^
+/usr/include/ruby-3.3.0/ruby/internal/arithmetic/long_long.h: In function ‘rb_num2ull_inline’:
+/usr/include/ruby-3.3.0/ruby/internal/arithmetic/long.h:53:22: error: conversion to ‘long long unsigned int’ from ‘long int’ may change the sign of the result [-Werror=sign-conversion]
+   53 | #define RB_FIX2LONG  rb_fix2long          /**< @alias{rb_fix2long} */
+/usr/include/ruby-3.3.0/ruby/internal/arithmetic/long_long.h:130:16: note: in expansion of macro ‘RB_FIX2LONG’
+  130 |         return RB_FIX2LONG(x);
+      |                ^~~~~~~~~~~
+In file included from /usr/include/ruby-3.3.0/ruby/internal/arithmetic.h:37:
+/usr/include/ruby-3.3.0/ruby/internal/arithmetic/st_data_t.h: In function ‘RB_ST2FIX’:
+/usr/include/ruby-3.3.0/ruby/internal/arithmetic/st_data_t.h:61:22: error: conversion to ‘long int’ from ‘st_data_t’ {aka ‘long unsigned int’} may change the sign of the result [-Werror=sign-conversion]
+   61 |     SIGNED_VALUE x = i;
+      |                      ^
+/usr/include/ruby-3.3.0/ruby/internal/arithmetic/st_data_t.h:72:24: error: conversion to ‘long int’ from ‘long unsigned int’ may change the sign of the result [-Werror=sign-conversion]
+   72 |     return RB_LONG2FIX(y);
+      |                        ^
+In file included from /usr/include/ruby-3.3.0/ruby/ruby.h:42:
+/usr/include/ruby-3.3.0/ruby/internal/memory.h: In function ‘rb_alloc_tmp_buffer2’:
+/usr/include/ruby-3.3.0/ruby/internal/memory.h:642:56: error: conversion to ‘size_t’ {aka ‘long unsigned int’} from ‘long int’ may change the sign of the result [-Werror=sign-conversion]
+  642 |     const size_t total_size = rbimpl_size_mul_or_raise(count, elsize);
+      |                                                        ^~~~~
+cc1: all warnings being treated as errors
+checked program was:
+/* begin */
+1: #include "ruby.h"
+2: 
+3: int main(int argc, char **argv)
+4: {
+5:   return !!argv[argc];
+6: }
+/* end */
+
+--------------------
+
+try_link_iconv: checking for iconv... -------------------- yes
+
+LD_LIBRARY_PATH=.:/usr/lib/x86_64-linux-gnu "x86_64-linux-gnu-gcc -o conftest -I/usr/include/x86_64-linux-gnu/ruby-3.3.0 -I/usr/include/ruby-3.3.0/ruby/backward -I/usr/include/ruby-3.3.0 -I. -Wdate-time -D_FORTIFY_SOURCE=3   -g -O3 -Werror=implicit-function-declaration -fno-omit-frame-pointer -mno-omit-leaf-frame-pointer -ffile-prefix-map=BUILDDIR=. -fstack-protector-strong -fstack-clash-protection -Wformat -Werror=format-security -fcf-protection -fdebug-prefix-map=BUILDDIR=/usr/src/ruby3.3-3.3.7-1ubuntu2 -fPIC -std=c99 -Wno-declaration-after-statement -O2 -g -Winline -Wmissing-noreturn conftest.c  -L. -L/usr/lib/x86_64-linux-gnu -L. -Wl,-Bsymbolic-functions -Wl,-z,relro -Wl,-z,now -fstack-protector-strong -rdynamic -Wl,-export-dynamic -Wl,--no-as-needed     -lruby-3.3  -lm -lpthread  -lc"
+checked program was:
+/* begin */
+ 1: #include "ruby.h"
+ 2: 
+ 3: #include <stdlib.h>
+ 4: #include <iconv.h>
+ 5: int main(void)
+ 6: {
+ 7:     iconv_t cd = iconv_open("", "");
+ 8:     iconv(cd, NULL, NULL, NULL, NULL);
+ 9:     return EXIT_SUCCESS;
+10: }
+/* end */
+
+--------------------
+
+append_cppflags: checking for whether -DNOKOGIRI_PACKAGED_LIBRARIES is accepted as CPPFLAGS... -------------------- yes
+
+LD_LIBRARY_PATH=.:/usr/lib/x86_64-linux-gnu "x86_64-linux-gnu-gcc -I/usr/include/x86_64-linux-gnu/ruby-3.3.0 -I/usr/include/ruby-3.3.0/ruby/backward -I/usr/include/ruby-3.3.0 -I. -Wdate-time -D_FORTIFY_SOURCE=3   -g -O3 -Werror=implicit-function-declaration -fno-omit-frame-pointer -mno-omit-leaf-frame-pointer -ffile-prefix-map=BUILDDIR=. -fstack-protector-strong -fstack-clash-protection -Wformat -Werror=format-security -fcf-protection -fdebug-prefix-map=BUILDDIR=/usr/src/ruby3.3-3.3.7-1ubuntu2 -fPIC -std=c99 -Wno-declaration-after-statement -O2 -g -Winline -Wmissing-noreturn  -DNOKOGIRI_PACKAGED_LIBRARIES -Werror -c conftest.c"
+checked program was:
+/* begin */
+1: #include "ruby.h"
+2: 
+3: int main(int argc, char **argv)
+4: {
+5:   return !!argv[argc];
+6: }
+/* end */
+
+--------------------
+
+append_cppflags: checking for whether -DNOKOGIRI_LIBXML2_PATCHES="\"0001-Remove-script-macro-support.patch 0002-Update-entities-to-remove-handling-of-ssi.patch 0009-allow-wildcard-namespaces.patch 0010-update-config.guess-and-config.sub-for-libxml2.patch 0011-rip-out-libxml2-s-libc_single_threaded-support.patch 0019-xpath-Use-separate-static-hash-table-for-standard-fu.patch\"" is accepted as CPPFLAGS... -------------------- yes
+
+LD_LIBRARY_PATH=.:/usr/lib/x86_64-linux-gnu "x86_64-linux-gnu-gcc -I/usr/include/x86_64-linux-gnu/ruby-3.3.0 -I/usr/include/ruby-3.3.0/ruby/backward -I/usr/include/ruby-3.3.0 -I. -I/workspace/vendor/bundle/ruby/3.3.0/gems/nokogiri-1.18.8/ports/x86_64-linux-gnu/libxml2/2.13.8/include/libxml2 -Wdate-time -D_FORTIFY_SOURCE=3   -DNOKOGIRI_PACKAGED_LIBRARIES -g -O3 -Werror=implicit-function-declaration -fno-omit-frame-pointer -mno-omit-leaf-frame-pointer -ffile-prefix-map=BUILDDIR=. -fstack-protector-strong -fstack-clash-protection -Wformat -Werror=format-security -fcf-protection -fdebug-prefix-map=BUILDDIR=/usr/src/ruby3.3-3.3.7-1ubuntu2 -fPIC -std=c99 -Wno-declaration-after-statement -O2 -g -Winline -Wmissing-noreturn  -DNOKOGIRI_LIBXML2_PATCHES="\"0001-Remove-script-macro-support.patch 0002-Update-entities-to-remove-handling-of-ssi.patch 0009-allow-wildcard-namespaces.patch 0010-update-config.guess-and-config.sub-for-libxml2.patch 0011-rip-out-libxml2-s-libc_single_threaded-support.patch 0019-xpath-Use-separate-static-hash-table-for-standard-fu.patch\"" -Werror -c conftest.c"
+checked program was:
+/* begin */
+1: #include "ruby.h"
+2: 
+3: int main(int argc, char **argv)
+4: {
+5:   return !!argv[argc];
+6: }
+/* end */
+
+--------------------
+
+have_library: checking for -llzma... -------------------- no
+
+LD_LIBRARY_PATH=.:/usr/lib/x86_64-linux-gnu "x86_64-linux-gnu-gcc -o conftest -I/usr/include/x86_64-linux-gnu/ruby-3.3.0 -I/usr/include/ruby-3.3.0/ruby/backward -I/usr/include/ruby-3.3.0 -I. -I/workspace/vendor/bundle/ruby/3.3.0/gems/nokogiri-1.18.8/ports/x86_64-linux-gnu/libxml2/2.13.8/include/libxml2 -Wdate-time -D_FORTIFY_SOURCE=3   -DNOKOGIRI_PACKAGED_LIBRARIES -DNOKOGIRI_LIBXML2_PATCHES="\"0001-Remove-script-macro-support.patch 0002-Update-entities-to-remove-handling-of-ssi.patch 0009-allow-wildcard-namespaces.patch 0010-update-config.guess-and-config.sub-for-libxml2.patch 0011-rip-out-libxml2-s-libc_single_threaded-support.patch 0019-xpath-Use-separate-static-hash-table-for-standard-fu.patch\"" -g -O3 -Werror=implicit-function-declaration -fno-omit-frame-pointer -mno-omit-leaf-frame-pointer -ffile-prefix-map=BUILDDIR=. -fstack-protector-strong -fstack-clash-protection -Wformat -Werror=format-security -fcf-protection -fdebug-prefix-map=BUILDDIR=/usr/src/ruby3.3-3.3.7-1ubuntu2 -fPIC -std=c99 -Wno-declaration-after-statement -O2 -g -Winline -Wmissing-noreturn conftest.c  -L. -L/usr/lib/x86_64-linux-gnu -L/workspace/vendor/bundle/ruby/3.3.0/gems/nokogiri-1.18.8/ports/x86_64-linux-gnu/libxml2/2.13.8/lib -L. -Wl,-Bsymbolic-functions -Wl,-z,relro -Wl,-z,now -fstack-protector-strong -rdynamic -Wl,-export-dynamic -Wl,--no-as-needed     -lruby-3.3 -llzma  -lm -lpthread  -lc"
+/usr/bin/ld: cannot find -llzma: No such file or directory
+collect2: error: ld returned 1 exit status
+checked program was:
+/* begin */
+ 1: #include "ruby.h"
+ 2: 
+ 3: /*top*/
+ 4: extern int t(void);
+ 5: int main(int argc, char **argv)
+ 6: {
+ 7:   if (argc > 1000000) {
+ 8:     int (* volatile tp)(void)=(int (*)(void))&t;
+ 9:     printf("%d", (*tp)());
+10:   }
+11: 
+12:   return !!argv[argc];
+13: }
+14: 
+15: int t(void) { ; return 0; }
+/* end */
+
+--------------------
+
+have_library: checking for -lliblzma... -------------------- no
+
+LD_LIBRARY_PATH=.:/usr/lib/x86_64-linux-gnu "x86_64-linux-gnu-gcc -o conftest -I/usr/include/x86_64-linux-gnu/ruby-3.3.0 -I/usr/include/ruby-3.3.0/ruby/backward -I/usr/include/ruby-3.3.0 -I. -I/workspace/vendor/bundle/ruby/3.3.0/gems/nokogiri-1.18.8/ports/x86_64-linux-gnu/libxml2/2.13.8/include/libxml2 -Wdate-time -D_FORTIFY_SOURCE=3   -DNOKOGIRI_PACKAGED_LIBRARIES -DNOKOGIRI_LIBXML2_PATCHES="\"0001-Remove-script-macro-support.patch 0002-Update-entities-to-remove-handling-of-ssi.patch 0009-allow-wildcard-namespaces.patch 0010-update-config.guess-and-config.sub-for-libxml2.patch 0011-rip-out-libxml2-s-libc_single_threaded-support.patch 0019-xpath-Use-separate-static-hash-table-for-standard-fu.patch\"" -g -O3 -Werror=implicit-function-declaration -fno-omit-frame-pointer -mno-omit-leaf-frame-pointer -ffile-prefix-map=BUILDDIR=. -fstack-protector-strong -fstack-clash-protection -Wformat -Werror=format-security -fcf-protection -fdebug-prefix-map=BUILDDIR=/usr/src/ruby3.3-3.3.7-1ubuntu2 -fPIC -std=c99 -Wno-declaration-after-statement -O2 -g -Winline -Wmissing-noreturn conftest.c  -L. -L/usr/lib/x86_64-linux-gnu -L/workspace/vendor/bundle/ruby/3.3.0/gems/nokogiri-1.18.8/ports/x86_64-linux-gnu/libxml2/2.13.8/lib -L. -Wl,-Bsymbolic-functions -Wl,-z,relro -Wl,-z,now -fstack-protector-strong -rdynamic -Wl,-export-dynamic -Wl,--no-as-needed     -lruby-3.3 -lliblzma  -lm -lpthread  -lc"
+/usr/bin/ld: cannot find -lliblzma: No such file or directory
+collect2: error: ld returned 1 exit status
+checked program was:
+/* begin */
+ 1: #include "ruby.h"
+ 2: 
+ 3: /*top*/
+ 4: extern int t(void);
+ 5: int main(int argc, char **argv)
+ 6: {
+ 7:   if (argc > 1000000) {
+ 8:     int (* volatile tp)(void)=(int (*)(void))&t;
+ 9:     printf("%d", (*tp)());
+10:   }
+11: 
+12:   return !!argv[argc];
+13: }
+14: 
+15: int t(void) { ; return 0; }
+/* end */
+
+--------------------
+
+append_cppflags: checking for whether -DNOKOGIRI_LIBXSLT_PATCHES="\"0001-update-config.guess-and-config.sub-for-libxslt.patch\"" is accepted as CPPFLAGS... -------------------- yes
+
+LD_LIBRARY_PATH=.:/usr/lib/x86_64-linux-gnu "x86_64-linux-gnu-gcc -I/usr/include/x86_64-linux-gnu/ruby-3.3.0 -I/usr/include/ruby-3.3.0/ruby/backward -I/usr/include/ruby-3.3.0 -I. -I/workspace/vendor/bundle/ruby/3.3.0/gems/nokogiri-1.18.8/ports/x86_64-linux-gnu/libxml2/2.13.8/include/libxml2 -I/workspace/vendor/bundle/ruby/3.3.0/gems/nokogiri-1.18.8/ports/x86_64-linux-gnu/libxslt/1.1.43/include -I/workspace/vendor/bundle/ruby/3.3.0/gems/nokogiri-1.18.8/ports/x86_64-linux-gnu/libxml2/2.13.8/include/libxml2 -Wdate-time -D_FORTIFY_SOURCE=3   -DNOKOGIRI_PACKAGED_LIBRARIES -DNOKOGIRI_LIBXML2_PATCHES="\"0001-Remove-script-macro-support.patch 0002-Update-entities-to-remove-handling-of-ssi.patch 0009-allow-wildcard-namespaces.patch 0010-update-config.guess-and-config.sub-for-libxml2.patch 0011-rip-out-libxml2-s-libc_single_threaded-support.patch 0019-xpath-Use-separate-static-hash-table-for-standard-fu.patch\"" -g -O3 -Werror=implicit-function-declaration -fno-omit-frame-pointer -mno-omit-leaf-frame-pointer -ffile-prefix-map=BUILDDIR=. -fstack-protector-strong -fstack-clash-protection -Wformat -Werror=format-security -fcf-protection -fdebug-prefix-map=BUILDDIR=/usr/src/ruby3.3-3.3.7-1ubuntu2 -fPIC -std=c99 -Wno-declaration-after-statement -O2 -g -Winline -Wmissing-noreturn  -DNOKOGIRI_LIBXSLT_PATCHES="\"0001-update-config.guess-and-config.sub-for-libxslt.patch\"" -Werror -c conftest.c"
+checked program was:
+/* begin */
+1: #include "ruby.h"
+2: 
+3: int main(int argc, char **argv)
+4: {
+5:   return !!argv[argc];
+6: }
+/* end */
+
+--------------------
+
+have_func: checking for xmlParseDoc() in libxml/parser.h... -------------------- yes
+
+LD_LIBRARY_PATH=.:/usr/lib/x86_64-linux-gnu "x86_64-linux-gnu-gcc -o conftest -I/usr/include/x86_64-linux-gnu/ruby-3.3.0 -I/usr/include/ruby-3.3.0/ruby/backward -I/usr/include/ruby-3.3.0 -I. -I/workspace/vendor/bundle/ruby/3.3.0/gems/nokogiri-1.18.8/ports/x86_64-linux-gnu/libxml2/2.13.8/include/libxml2 -I/workspace/vendor/bundle/ruby/3.3.0/gems/nokogiri-1.18.8/ports/x86_64-linux-gnu/libxslt/1.1.43/include -I/workspace/vendor/bundle/ruby/3.3.0/gems/nokogiri-1.18.8/ports/x86_64-linux-gnu/libxml2/2.13.8/include/libxml2 -Wdate-time -D_FORTIFY_SOURCE=3   -DNOKOGIRI_PACKAGED_LIBRARIES -DNOKOGIRI_LIBXML2_PATCHES="\"0001-Remove-script-macro-support.patch 0002-Update-entities-to-remove-handling-of-ssi.patch 0009-allow-wildcard-namespaces.patch 0010-update-config.guess-and-config.sub-for-libxml2.patch 0011-rip-out-libxml2-s-libc_single_threaded-support.patch 0019-xpath-Use-separate-static-hash-table-for-standard-fu.patch\"" -DNOKOGIRI_LIBXSLT_PATCHES="\"0001-update-config.guess-and-config.sub-for-libxslt.patch\"" -g -O3 -Werror=implicit-function-declaration -fno-omit-frame-pointer -mno-omit-leaf-frame-pointer -ffile-prefix-map=BUILDDIR=. -fstack-protector-strong -fstack-clash-protection -Wformat -Werror=format-security -fcf-protection -fdebug-prefix-map=BUILDDIR=/usr/src/ruby3.3-3.3.7-1ubuntu2 -fPIC -std=c99 -Wno-declaration-after-statement -O2 -g -Winline -Wmissing-noreturn conftest.c  -L. -L/usr/lib/x86_64-linux-gnu -L/workspace/vendor/bundle/ruby/3.3.0/gems/nokogiri-1.18.8/ports/x86_64-linux-gnu/libxml2/2.13.8/lib -L/workspace/vendor/bundle/ruby/3.3.0/gems/nokogiri-1.18.8/ports/x86_64-linux-gnu/libxslt/1.1.43/lib -L. -Wl,-Bsymbolic-functions -Wl,-z,relro -Wl,-z,now -fstack-protector-strong -rdynamic -Wl,-export-dynamic -Wl,--no-as-needed    /workspace/vendor/bundle/ruby/3.3.0/gems/nokogiri-1.18.8/ports/x86_64-linux-gnu/libxslt/1.1.43/lib/libexslt.a -lm -lz /workspace/vendor/bundle/ruby/3.3.0/gems/nokogiri-1.18.8/ports/x86_64-linux-gnu/libxml2/2.13.8/lib/libxml2.a /workspace/vendor/bundle/ruby/3.3.0/gems/nokogiri-1.18.8/ports/x86_64-linux-gnu/libxslt/1.1.43/lib/libxslt.a -lm -lz /workspace/vendor/bundle/ruby/3.3.0/gems/nokogiri-1.18.8/ports/x86_64-linux-gnu/libxml2/2.13.8/lib/libxml2.a -lruby-3.3 /workspace/vendor/bundle/ruby/3.3.0/gems/nokogiri-1.18.8/ports/x86_64-linux-gnu/libxslt/1.1.43/lib/libexslt.a -lm -lz /workspace/vendor/bundle/ruby/3.3.0/gems/nokogiri-1.18.8/ports/x86_64-linux-gnu/libxml2/2.13.8/lib/libxml2.a /workspace/vendor/bundle/ruby/3.3.0/gems/nokogiri-1.18.8/ports/x86_64-linux-gnu/libxslt/1.1.43/lib/libxslt.a -lm -lz /workspace/vendor/bundle/ruby/3.3.0/gems/nokogiri-1.18.8/ports/x86_64-linux-gnu/libxml2/2.13.8/lib/libxml2.a -lm -lpthread  -lc"
+checked program was:
+/* begin */
+ 1: #include "ruby.h"
+ 2: 
+ 3: #include <libxml/parser.h>
+ 4: 
+ 5: /*top*/
+ 6: extern int t(void);
+ 7: int main(int argc, char **argv)
+ 8: {
+ 9:   if (argc > 1000000) {
+10:     int (* volatile tp)(void)=(int (*)(void))&t;
+11:     printf("%d", (*tp)());
+12:   }
+13: 
+14:   return !!argv[argc];
+15: }
+16: int t(void) { void ((*volatile p)()); p = (void ((*)()))xmlParseDoc; return !p; }
+/* end */
+
+--------------------
+
+have_func: checking for xsltParseStylesheetDoc() in libxslt/xslt.h... -------------------- yes
+
+LD_LIBRARY_PATH=.:/usr/lib/x86_64-linux-gnu "x86_64-linux-gnu-gcc -o conftest -I/usr/include/x86_64-linux-gnu/ruby-3.3.0 -I/usr/include/ruby-3.3.0/ruby/backward -I/usr/include/ruby-3.3.0 -I. -I/workspace/vendor/bundle/ruby/3.3.0/gems/nokogiri-1.18.8/ports/x86_64-linux-gnu/libxml2/2.13.8/include/libxml2 -I/workspace/vendor/bundle/ruby/3.3.0/gems/nokogiri-1.18.8/ports/x86_64-linux-gnu/libxslt/1.1.43/include -I/workspace/vendor/bundle/ruby/3.3.0/gems/nokogiri-1.18.8/ports/x86_64-linux-gnu/libxml2/2.13.8/include/libxml2 -Wdate-time -D_FORTIFY_SOURCE=3   -DNOKOGIRI_PACKAGED_LIBRARIES -DNOKOGIRI_LIBXML2_PATCHES="\"0001-Remove-script-macro-support.patch 0002-Update-entities-to-remove-handling-of-ssi.patch 0009-allow-wildcard-namespaces.patch 0010-update-config.guess-and-config.sub-for-libxml2.patch 0011-rip-out-libxml2-s-libc_single_threaded-support.patch 0019-xpath-Use-separate-static-hash-table-for-standard-fu.patch\"" -DNOKOGIRI_LIBXSLT_PATCHES="\"0001-update-config.guess-and-config.sub-for-libxslt.patch\"" -g -O3 -Werror=implicit-function-declaration -fno-omit-frame-pointer -mno-omit-leaf-frame-pointer -ffile-prefix-map=BUILDDIR=. -fstack-protector-strong -fstack-clash-protection -Wformat -Werror=format-security -fcf-protection -fdebug-prefix-map=BUILDDIR=/usr/src/ruby3.3-3.3.7-1ubuntu2 -fPIC -std=c99 -Wno-declaration-after-statement -O2 -g -Winline -Wmissing-noreturn conftest.c  -L. -L/usr/lib/x86_64-linux-gnu -L/workspace/vendor/bundle/ruby/3.3.0/gems/nokogiri-1.18.8/ports/x86_64-linux-gnu/libxml2/2.13.8/lib -L/workspace/vendor/bundle/ruby/3.3.0/gems/nokogiri-1.18.8/ports/x86_64-linux-gnu/libxslt/1.1.43/lib -L. -Wl,-Bsymbolic-functions -Wl,-z,relro -Wl,-z,now -fstack-protector-strong -rdynamic -Wl,-export-dynamic -Wl,--no-as-needed    /workspace/vendor/bundle/ruby/3.3.0/gems/nokogiri-1.18.8/ports/x86_64-linux-gnu/libxslt/1.1.43/lib/libexslt.a -lm -lz /workspace/vendor/bundle/ruby/3.3.0/gems/nokogiri-1.18.8/ports/x86_64-linux-gnu/libxml2/2.13.8/lib/libxml2.a /workspace/vendor/bundle/ruby/3.3.0/gems/nokogiri-1.18.8/ports/x86_64-linux-gnu/libxslt/1.1.43/lib/libxslt.a -lm -lz /workspace/vendor/bundle/ruby/3.3.0/gems/nokogiri-1.18.8/ports/x86_64-linux-gnu/libxml2/2.13.8/lib/libxml2.a -lruby-3.3 /workspace/vendor/bundle/ruby/3.3.0/gems/nokogiri-1.18.8/ports/x86_64-linux-gnu/libxslt/1.1.43/lib/libexslt.a -lm -lz /workspace/vendor/bundle/ruby/3.3.0/gems/nokogiri-1.18.8/ports/x86_64-linux-gnu/libxml2/2.13.8/lib/libxml2.a /workspace/vendor/bundle/ruby/3.3.0/gems/nokogiri-1.18.8/ports/x86_64-linux-gnu/libxslt/1.1.43/lib/libxslt.a -lm -lz /workspace/vendor/bundle/ruby/3.3.0/gems/nokogiri-1.18.8/ports/x86_64-linux-gnu/libxml2/2.13.8/lib/libxml2.a -lm -lpthread  -lc"
+conftest.c: In function ‘t’:
+conftest.c:16:57: error: ‘xsltParseStylesheetDoc’ undeclared (first use in this function)
+   16 | int t(void) { void ((*volatile p)()); p = (void ((*)()))xsltParseStylesheetDoc; return !p; }
+      |                                                         ^~~~~~~~~~~~~~~~~~~~~~
+conftest.c:16:57: note: each undeclared identifier is reported only once for each function it appears in
+checked program was:
+/* begin */
+ 1: #include "ruby.h"
+ 2: 
+ 3: #include <libxslt/xslt.h>
+ 4: 
+ 5: /*top*/
+ 6: extern int t(void);
+ 7: int main(int argc, char **argv)
+ 8: {
+ 9:   if (argc > 1000000) {
+10:     int (* volatile tp)(void)=(int (*)(void))&t;
+11:     printf("%d", (*tp)());
+12:   }
+13: 
+14:   return !!argv[argc];
+15: }
+16: int t(void) { void ((*volatile p)()); p = (void ((*)()))xsltParseStylesheetDoc; return !p; }
+/* end */
+
+LD_LIBRARY_PATH=.:/usr/lib/x86_64-linux-gnu "x86_64-linux-gnu-gcc -o conftest -I/usr/include/x86_64-linux-gnu/ruby-3.3.0 -I/usr/include/ruby-3.3.0/ruby/backward -I/usr/include/ruby-3.3.0 -I. -I/workspace/vendor/bundle/ruby/3.3.0/gems/nokogiri-1.18.8/ports/x86_64-linux-gnu/libxml2/2.13.8/include/libxml2 -I/workspace/vendor/bundle/ruby/3.3.0/gems/nokogiri-1.18.8/ports/x86_64-linux-gnu/libxslt/1.1.43/include -I/workspace/vendor/bundle/ruby/3.3.0/gems/nokogiri-1.18.8/ports/x86_64-linux-gnu/libxml2/2.13.8/include/libxml2 -Wdate-time -D_FORTIFY_SOURCE=3   -DNOKOGIRI_PACKAGED_LIBRARIES -DNOKOGIRI_LIBXML2_PATCHES="\"0001-Remove-script-macro-support.patch 0002-Update-entities-to-remove-handling-of-ssi.patch 0009-allow-wildcard-namespaces.patch 0010-update-config.guess-and-config.sub-for-libxml2.patch 0011-rip-out-libxml2-s-libc_single_threaded-support.patch 0019-xpath-Use-separate-static-hash-table-for-standard-fu.patch\"" -DNOKOGIRI_LIBXSLT_PATCHES="\"0001-update-config.guess-and-config.sub-for-libxslt.patch\"" -g -O3 -Werror=implicit-function-declaration -fno-omit-frame-pointer -mno-omit-leaf-frame-pointer -ffile-prefix-map=BUILDDIR=. -fstack-protector-strong -fstack-clash-protection -Wformat -Werror=format-security -fcf-protection -fdebug-prefix-map=BUILDDIR=/usr/src/ruby3.3-3.3.7-1ubuntu2 -fPIC -std=c99 -Wno-declaration-after-statement -O2 -g -Winline -Wmissing-noreturn conftest.c  -L. -L/usr/lib/x86_64-linux-gnu -L/workspace/vendor/bundle/ruby/3.3.0/gems/nokogiri-1.18.8/ports/x86_64-linux-gnu/libxml2/2.13.8/lib -L/workspace/vendor/bundle/ruby/3.3.0/gems/nokogiri-1.18.8/ports/x86_64-linux-gnu/libxslt/1.1.43/lib -L. -Wl,-Bsymbolic-functions -Wl,-z,relro -Wl,-z,now -fstack-protector-strong -rdynamic -Wl,-export-dynamic -Wl,--no-as-needed    /workspace/vendor/bundle/ruby/3.3.0/gems/nokogiri-1.18.8/ports/x86_64-linux-gnu/libxslt/1.1.43/lib/libexslt.a -lm -lz /workspace/vendor/bundle/ruby/3.3.0/gems/nokogiri-1.18.8/ports/x86_64-linux-gnu/libxml2/2.13.8/lib/libxml2.a /workspace/vendor/bundle/ruby/3.3.0/gems/nokogiri-1.18.8/ports/x86_64-linux-gnu/libxslt/1.1.43/lib/libxslt.a -lm -lz /workspace/vendor/bundle/ruby/3.3.0/gems/nokogiri-1.18.8/ports/x86_64-linux-gnu/libxml2/2.13.8/lib/libxml2.a -lruby-3.3 /workspace/vendor/bundle/ruby/3.3.0/gems/nokogiri-1.18.8/ports/x86_64-linux-gnu/libxslt/1.1.43/lib/libexslt.a -lm -lz /workspace/vendor/bundle/ruby/3.3.0/gems/nokogiri-1.18.8/ports/x86_64-linux-gnu/libxml2/2.13.8/lib/libxml2.a /workspace/vendor/bundle/ruby/3.3.0/gems/nokogiri-1.18.8/ports/x86_64-linux-gnu/libxslt/1.1.43/lib/libxslt.a -lm -lz /workspace/vendor/bundle/ruby/3.3.0/gems/nokogiri-1.18.8/ports/x86_64-linux-gnu/libxml2/2.13.8/lib/libxml2.a -lm -lpthread  -lc"
+checked program was:
+/* begin */
+ 1: #include "ruby.h"
+ 2: 
+ 3: #include <libxslt/xslt.h>
+ 4: 
+ 5: /*top*/
+ 6: extern int t(void);
+ 7: int main(int argc, char **argv)
+ 8: {
+ 9:   if (argc > 1000000) {
+10:     int (* volatile tp)(void)=(int (*)(void))&t;
+11:     printf("%d", (*tp)());
+12:   }
+13: 
+14:   return !!argv[argc];
+15: }
+16: extern void xsltParseStylesheetDoc();
+17: int t(void) { xsltParseStylesheetDoc(); return 0; }
+/* end */
+
+--------------------
+
+have_func: checking for exsltFuncRegister() in libexslt/exslt.h... -------------------- yes
+
+LD_LIBRARY_PATH=.:/usr/lib/x86_64-linux-gnu "x86_64-linux-gnu-gcc -o conftest -I/usr/include/x86_64-linux-gnu/ruby-3.3.0 -I/usr/include/ruby-3.3.0/ruby/backward -I/usr/include/ruby-3.3.0 -I. -I/workspace/vendor/bundle/ruby/3.3.0/gems/nokogiri-1.18.8/ports/x86_64-linux-gnu/libxml2/2.13.8/include/libxml2 -I/workspace/vendor/bundle/ruby/3.3.0/gems/nokogiri-1.18.8/ports/x86_64-linux-gnu/libxslt/1.1.43/include -I/workspace/vendor/bundle/ruby/3.3.0/gems/nokogiri-1.18.8/ports/x86_64-linux-gnu/libxml2/2.13.8/include/libxml2 -Wdate-time -D_FORTIFY_SOURCE=3   -DNOKOGIRI_PACKAGED_LIBRARIES -DNOKOGIRI_LIBXML2_PATCHES="\"0001-Remove-script-macro-support.patch 0002-Update-entities-to-remove-handling-of-ssi.patch 0009-allow-wildcard-namespaces.patch 0010-update-config.guess-and-config.sub-for-libxml2.patch 0011-rip-out-libxml2-s-libc_single_threaded-support.patch 0019-xpath-Use-separate-static-hash-table-for-standard-fu.patch\"" -DNOKOGIRI_LIBXSLT_PATCHES="\"0001-update-config.guess-and-config.sub-for-libxslt.patch\"" -g -O3 -Werror=implicit-function-declaration -fno-omit-frame-pointer -mno-omit-leaf-frame-pointer -ffile-prefix-map=BUILDDIR=. -fstack-protector-strong -fstack-clash-protection -Wformat -Werror=format-security -fcf-protection -fdebug-prefix-map=BUILDDIR=/usr/src/ruby3.3-3.3.7-1ubuntu2 -fPIC -std=c99 -Wno-declaration-after-statement -O2 -g -Winline -Wmissing-noreturn conftest.c  -L. -L/usr/lib/x86_64-linux-gnu -L/workspace/vendor/bundle/ruby/3.3.0/gems/nokogiri-1.18.8/ports/x86_64-linux-gnu/libxml2/2.13.8/lib -L/workspace/vendor/bundle/ruby/3.3.0/gems/nokogiri-1.18.8/ports/x86_64-linux-gnu/libxslt/1.1.43/lib -L. -Wl,-Bsymbolic-functions -Wl,-z,relro -Wl,-z,now -fstack-protector-strong -rdynamic -Wl,-export-dynamic -Wl,--no-as-needed    /workspace/vendor/bundle/ruby/3.3.0/gems/nokogiri-1.18.8/ports/x86_64-linux-gnu/libxslt/1.1.43/lib/libexslt.a -lm -lz /workspace/vendor/bundle/ruby/3.3.0/gems/nokogiri-1.18.8/ports/x86_64-linux-gnu/libxml2/2.13.8/lib/libxml2.a /workspace/vendor/bundle/ruby/3.3.0/gems/nokogiri-1.18.8/ports/x86_64-linux-gnu/libxslt/1.1.43/lib/libxslt.a -lm -lz /workspace/vendor/bundle/ruby/3.3.0/gems/nokogiri-1.18.8/ports/x86_64-linux-gnu/libxml2/2.13.8/lib/libxml2.a -lruby-3.3 /workspace/vendor/bundle/ruby/3.3.0/gems/nokogiri-1.18.8/ports/x86_64-linux-gnu/libxslt/1.1.43/lib/libexslt.a -lm -lz /workspace/vendor/bundle/ruby/3.3.0/gems/nokogiri-1.18.8/ports/x86_64-linux-gnu/libxml2/2.13.8/lib/libxml2.a /workspace/vendor/bundle/ruby/3.3.0/gems/nokogiri-1.18.8/ports/x86_64-linux-gnu/libxslt/1.1.43/lib/libxslt.a -lm -lz /workspace/vendor/bundle/ruby/3.3.0/gems/nokogiri-1.18.8/ports/x86_64-linux-gnu/libxml2/2.13.8/lib/libxml2.a -lm -lpthread  -lc"
+checked program was:
+/* begin */
+ 1: #include "ruby.h"
+ 2: 
+ 3: #include <libexslt/exslt.h>
+ 4: 
+ 5: /*top*/
+ 6: extern int t(void);
+ 7: int main(int argc, char **argv)
+ 8: {
+ 9:   if (argc > 1000000) {
+10:     int (* volatile tp)(void)=(int (*)(void))&t;
+11:     printf("%d", (*tp)());
+12:   }
+13: 
+14:   return !!argv[argc];
+15: }
+16: int t(void) { void ((*volatile p)()); p = (void ((*)()))exsltFuncRegister; return !p; }
+/* end */
+
+--------------------
+
+append_cppflags: checking for whether -I/workspace/vendor/bundle/ruby/3.3.0/gems/nokogiri-1.18.8/ext/nokogiri/ports/x86_64-linux-gnu/libgumbo/1.0.0-nokogiri/include is accepted as CPPFLAGS... -------------------- yes
+
+LD_LIBRARY_PATH=.:/usr/lib/x86_64-linux-gnu "x86_64-linux-gnu-gcc -I/usr/include/x86_64-linux-gnu/ruby-3.3.0 -I/usr/include/ruby-3.3.0/ruby/backward -I/usr/include/ruby-3.3.0 -I. -I/workspace/vendor/bundle/ruby/3.3.0/gems/nokogiri-1.18.8/ports/x86_64-linux-gnu/libxml2/2.13.8/include/libxml2 -I/workspace/vendor/bundle/ruby/3.3.0/gems/nokogiri-1.18.8/ports/x86_64-linux-gnu/libxslt/1.1.43/include -I/workspace/vendor/bundle/ruby/3.3.0/gems/nokogiri-1.18.8/ports/x86_64-linux-gnu/libxml2/2.13.8/include/libxml2 -Wdate-time -D_FORTIFY_SOURCE=3   -DNOKOGIRI_PACKAGED_LIBRARIES -DNOKOGIRI_LIBXML2_PATCHES="\"0001-Remove-script-macro-support.patch 0002-Update-entities-to-remove-handling-of-ssi.patch 0009-allow-wildcard-namespaces.patch 0010-update-config.guess-and-config.sub-for-libxml2.patch 0011-rip-out-libxml2-s-libc_single_threaded-support.patch 0019-xpath-Use-separate-static-hash-table-for-standard-fu.patch\"" -DNOKOGIRI_LIBXSLT_PATCHES="\"0001-update-config.guess-and-config.sub-for-libxslt.patch\"" -g -O3 -Werror=implicit-function-declaration -fno-omit-frame-pointer -mno-omit-leaf-frame-pointer -ffile-prefix-map=BUILDDIR=. -fstack-protector-strong -fstack-clash-protection -Wformat -Werror=format-security -fcf-protection -fdebug-prefix-map=BUILDDIR=/usr/src/ruby3.3-3.3.7-1ubuntu2 -fPIC -std=c99 -Wno-declaration-after-statement -O2 -g -Winline -Wmissing-noreturn  -I/workspace/vendor/bundle/ruby/3.3.0/gems/nokogiri-1.18.8/ext/nokogiri/ports/x86_64-linux-gnu/libgumbo/1.0.0-nokogiri/include -Werror -c conftest.c"
+checked program was:
+/* begin */
+1: #include "ruby.h"
+2: 
+3: int main(int argc, char **argv)
+4: {
+5:   return !!argv[argc];
+6: }
+/* end */
+
+--------------------
+
+have_func: checking for gumbo_parse_with_options() in nokogiri_gumbo.h... -------------------- yes
+
+LD_LIBRARY_PATH=.:/usr/lib/x86_64-linux-gnu "x86_64-linux-gnu-gcc -o conftest -I/usr/include/x86_64-linux-gnu/ruby-3.3.0 -I/usr/include/ruby-3.3.0/ruby/backward -I/usr/include/ruby-3.3.0 -I. -I/workspace/vendor/bundle/ruby/3.3.0/gems/nokogiri-1.18.8/ports/x86_64-linux-gnu/libxml2/2.13.8/include/libxml2 -I/workspace/vendor/bundle/ruby/3.3.0/gems/nokogiri-1.18.8/ports/x86_64-linux-gnu/libxslt/1.1.43/include -I/workspace/vendor/bundle/ruby/3.3.0/gems/nokogiri-1.18.8/ports/x86_64-linux-gnu/libxml2/2.13.8/include/libxml2 -Wdate-time -D_FORTIFY_SOURCE=3   -DNOKOGIRI_PACKAGED_LIBRARIES -DNOKOGIRI_LIBXML2_PATCHES="\"0001-Remove-script-macro-support.patch 0002-Update-entities-to-remove-handling-of-ssi.patch 0009-allow-wildcard-namespaces.patch 0010-update-config.guess-and-config.sub-for-libxml2.patch 0011-rip-out-libxml2-s-libc_single_threaded-support.patch 0019-xpath-Use-separate-static-hash-table-for-standard-fu.patch\"" -DNOKOGIRI_LIBXSLT_PATCHES="\"0001-update-config.guess-and-config.sub-for-libxslt.patch\"" -I/workspace/vendor/bundle/ruby/3.3.0/gems/nokogiri-1.18.8/ext/nokogiri/ports/x86_64-linux-gnu/libgumbo/1.0.0-nokogiri/include -g -O3 -Werror=implicit-function-declaration -fno-omit-frame-pointer -mno-omit-leaf-frame-pointer -ffile-prefix-map=BUILDDIR=. -fstack-protector-strong -fstack-clash-protection -Wformat -Werror=format-security -fcf-protection -fdebug-prefix-map=BUILDDIR=/usr/src/ruby3.3-3.3.7-1ubuntu2 -fPIC -std=c99 -Wno-declaration-after-statement -O2 -g -Winline -Wmissing-noreturn conftest.c  -L. -L/usr/lib/x86_64-linux-gnu -L/workspace/vendor/bundle/ruby/3.3.0/gems/nokogiri-1.18.8/ports/x86_64-linux-gnu/libxml2/2.13.8/lib -L/workspace/vendor/bundle/ruby/3.3.0/gems/nokogiri-1.18.8/ports/x86_64-linux-gnu/libxslt/1.1.43/lib -L/workspace/vendor/bundle/ruby/3.3.0/gems/nokogiri-1.18.8/ext/nokogiri/ports/x86_64-linux-gnu/libgumbo/1.0.0-nokogiri/lib -L. -Wl,-Bsymbolic-functions -Wl,-z,relro -Wl,-z,now -fstack-protector-strong -rdynamic -Wl,-export-dynamic -Wl,--no-as-needed    /workspace/vendor/bundle/ruby/3.3.0/gems/nokogiri-1.18.8/ports/x86_64-linux-gnu/libxslt/1.1.43/lib/libexslt.a -lm -lz /workspace/vendor/bundle/ruby/3.3.0/gems/nokogiri-1.18.8/ports/x86_64-linux-gnu/libxml2/2.13.8/lib/libxml2.a /workspace/vendor/bundle/ruby/3.3.0/gems/nokogiri-1.18.8/ports/x86_64-linux-gnu/libxslt/1.1.43/lib/libxslt.a -lm -lz /workspace/vendor/bundle/ruby/3.3.0/gems/nokogiri-1.18.8/ports/x86_64-linux-gnu/libxml2/2.13.8/lib/libxml2.a /workspace/vendor/bundle/ruby/3.3.0/gems/nokogiri-1.18.8/ext/nokogiri/ports/x86_64-linux-gnu/libgumbo/1.0.0-nokogiri/lib/libgumbo.a -lruby-3.3 /workspace/vendor/bundle/ruby/3.3.0/gems/nokogiri-1.18.8/ports/x86_64-linux-gnu/libxslt/1.1.43/lib/libexslt.a -lm -lz /workspace/vendor/bundle/ruby/3.3.0/gems/nokogiri-1.18.8/ports/x86_64-linux-gnu/libxml2/2.13.8/lib/libxml2.a /workspace/vendor/bundle/ruby/3.3.0/gems/nokogiri-1.18.8/ports/x86_64-linux-gnu/libxslt/1.1.43/lib/libxslt.a -lm -lz /workspace/vendor/bundle/ruby/3.3.0/gems/nokogiri-1.18.8/ports/x86_64-linux-gnu/libxml2/2.13.8/lib/libxml2.a /workspace/vendor/bundle/ruby/3.3.0/gems/nokogiri-1.18.8/ext/nokogiri/ports/x86_64-linux-gnu/libgumbo/1.0.0-nokogiri/lib/libgumbo.a -lm -lpthread  -lc"
+checked program was:
+/* begin */
+ 1: #include "ruby.h"
+ 2: 
+ 3: #include <nokogiri_gumbo.h>
+ 4: 
+ 5: /*top*/
+ 6: extern int t(void);
+ 7: int main(int argc, char **argv)
+ 8: {
+ 9:   if (argc > 1000000) {
+10:     int (* volatile tp)(void)=(int (*)(void))&t;
+11:     printf("%d", (*tp)());
+12:   }
+13: 
+14:   return !!argv[argc];
+15: }
+16: int t(void) { void ((*volatile p)()); p = (void ((*)()))gumbo_parse_with_options; return !p; }
+/* end */
+
+--------------------
+
+have_func: checking for xmlCtxtSetOptions()... -------------------- yes
+
+LD_LIBRARY_PATH=.:/usr/lib/x86_64-linux-gnu "x86_64-linux-gnu-gcc -o conftest -I/usr/include/x86_64-linux-gnu/ruby-3.3.0 -I/usr/include/ruby-3.3.0/ruby/backward -I/usr/include/ruby-3.3.0 -I. -I/workspace/vendor/bundle/ruby/3.3.0/gems/nokogiri-1.18.8/ports/x86_64-linux-gnu/libxml2/2.13.8/include/libxml2 -I/workspace/vendor/bundle/ruby/3.3.0/gems/nokogiri-1.18.8/ports/x86_64-linux-gnu/libxslt/1.1.43/include -I/workspace/vendor/bundle/ruby/3.3.0/gems/nokogiri-1.18.8/ports/x86_64-linux-gnu/libxml2/2.13.8/include/libxml2 -Wdate-time -D_FORTIFY_SOURCE=3   -DNOKOGIRI_PACKAGED_LIBRARIES -DNOKOGIRI_LIBXML2_PATCHES="\"0001-Remove-script-macro-support.patch 0002-Update-entities-to-remove-handling-of-ssi.patch 0009-allow-wildcard-namespaces.patch 0010-update-config.guess-and-config.sub-for-libxml2.patch 0011-rip-out-libxml2-s-libc_single_threaded-support.patch 0019-xpath-Use-separate-static-hash-table-for-standard-fu.patch\"" -DNOKOGIRI_LIBXSLT_PATCHES="\"0001-update-config.guess-and-config.sub-for-libxslt.patch\"" -I/workspace/vendor/bundle/ruby/3.3.0/gems/nokogiri-1.18.8/ext/nokogiri/ports/x86_64-linux-gnu/libgumbo/1.0.0-nokogiri/include -g -O3 -Werror=implicit-function-declaration -fno-omit-frame-pointer -mno-omit-leaf-frame-pointer -ffile-prefix-map=BUILDDIR=. -fstack-protector-strong -fstack-clash-protection -Wformat -Werror=format-security -fcf-protection -fdebug-prefix-map=BUILDDIR=/usr/src/ruby3.3-3.3.7-1ubuntu2 -fPIC -std=c99 -Wno-declaration-after-statement -O2 -g -Winline -Wmissing-noreturn conftest.c  -L. -L/usr/lib/x86_64-linux-gnu -L/workspace/vendor/bundle/ruby/3.3.0/gems/nokogiri-1.18.8/ports/x86_64-linux-gnu/libxml2/2.13.8/lib -L/workspace/vendor/bundle/ruby/3.3.0/gems/nokogiri-1.18.8/ports/x86_64-linux-gnu/libxslt/1.1.43/lib -L/workspace/vendor/bundle/ruby/3.3.0/gems/nokogiri-1.18.8/ext/nokogiri/ports/x86_64-linux-gnu/libgumbo/1.0.0-nokogiri/lib -L. -Wl,-Bsymbolic-functions -Wl,-z,relro -Wl,-z,now -fstack-protector-strong -rdynamic -Wl,-export-dynamic -Wl,--no-as-needed    /workspace/vendor/bundle/ruby/3.3.0/gems/nokogiri-1.18.8/ports/x86_64-linux-gnu/libxslt/1.1.43/lib/libexslt.a -lm -lz /workspace/vendor/bundle/ruby/3.3.0/gems/nokogiri-1.18.8/ports/x86_64-linux-gnu/libxml2/2.13.8/lib/libxml2.a /workspace/vendor/bundle/ruby/3.3.0/gems/nokogiri-1.18.8/ports/x86_64-linux-gnu/libxslt/1.1.43/lib/libxslt.a -lm -lz /workspace/vendor/bundle/ruby/3.3.0/gems/nokogiri-1.18.8/ports/x86_64-linux-gnu/libxml2/2.13.8/lib/libxml2.a /workspace/vendor/bundle/ruby/3.3.0/gems/nokogiri-1.18.8/ext/nokogiri/ports/x86_64-linux-gnu/libgumbo/1.0.0-nokogiri/lib/libgumbo.a -lruby-3.3 /workspace/vendor/bundle/ruby/3.3.0/gems/nokogiri-1.18.8/ports/x86_64-linux-gnu/libxslt/1.1.43/lib/libexslt.a -lm -lz /workspace/vendor/bundle/ruby/3.3.0/gems/nokogiri-1.18.8/ports/x86_64-linux-gnu/libxml2/2.13.8/lib/libxml2.a /workspace/vendor/bundle/ruby/3.3.0/gems/nokogiri-1.18.8/ports/x86_64-linux-gnu/libxslt/1.1.43/lib/libxslt.a -lm -lz /workspace/vendor/bundle/ruby/3.3.0/gems/nokogiri-1.18.8/ports/x86_64-linux-gnu/libxml2/2.13.8/lib/libxml2.a /workspace/vendor/bundle/ruby/3.3.0/gems/nokogiri-1.18.8/ext/nokogiri/ports/x86_64-linux-gnu/libgumbo/1.0.0-nokogiri/lib/libgumbo.a -lm -lpthread  -lc"
+conftest.c: In function ‘t’:
+conftest.c:14:57: error: ‘xmlCtxtSetOptions’ undeclared (first use in this function)
+   14 | int t(void) { void ((*volatile p)()); p = (void ((*)()))xmlCtxtSetOptions; return !p; }
+      |                                                         ^~~~~~~~~~~~~~~~~
+conftest.c:14:57: note: each undeclared identifier is reported only once for each function it appears in
+checked program was:
+/* begin */
+ 1: #include "ruby.h"
+ 2: 
+ 3: /*top*/
+ 4: extern int t(void);
+ 5: int main(int argc, char **argv)
+ 6: {
+ 7:   if (argc > 1000000) {
+ 8:     int (* volatile tp)(void)=(int (*)(void))&t;
+ 9:     printf("%d", (*tp)());
+10:   }
+11: 
+12:   return !!argv[argc];
+13: }
+14: int t(void) { void ((*volatile p)()); p = (void ((*)()))xmlCtxtSetOptions; return !p; }
+/* end */
+
+LD_LIBRARY_PATH=.:/usr/lib/x86_64-linux-gnu "x86_64-linux-gnu-gcc -o conftest -I/usr/include/x86_64-linux-gnu/ruby-3.3.0 -I/usr/include/ruby-3.3.0/ruby/backward -I/usr/include/ruby-3.3.0 -I. -I/workspace/vendor/bundle/ruby/3.3.0/gems/nokogiri-1.18.8/ports/x86_64-linux-gnu/libxml2/2.13.8/include/libxml2 -I/workspace/vendor/bundle/ruby/3.3.0/gems/nokogiri-1.18.8/ports/x86_64-linux-gnu/libxslt/1.1.43/include -I/workspace/vendor/bundle/ruby/3.3.0/gems/nokogiri-1.18.8/ports/x86_64-linux-gnu/libxml2/2.13.8/include/libxml2 -Wdate-time -D_FORTIFY_SOURCE=3   -DNOKOGIRI_PACKAGED_LIBRARIES -DNOKOGIRI_LIBXML2_PATCHES="\"0001-Remove-script-macro-support.patch 0002-Update-entities-to-remove-handling-of-ssi.patch 0009-allow-wildcard-namespaces.patch 0010-update-config.guess-and-config.sub-for-libxml2.patch 0011-rip-out-libxml2-s-libc_single_threaded-support.patch 0019-xpath-Use-separate-static-hash-table-for-standard-fu.patch\"" -DNOKOGIRI_LIBXSLT_PATCHES="\"0001-update-config.guess-and-config.sub-for-libxslt.patch\"" -I/workspace/vendor/bundle/ruby/3.3.0/gems/nokogiri-1.18.8/ext/nokogiri/ports/x86_64-linux-gnu/libgumbo/1.0.0-nokogiri/include -g -O3 -Werror=implicit-function-declaration -fno-omit-frame-pointer -mno-omit-leaf-frame-pointer -ffile-prefix-map=BUILDDIR=. -fstack-protector-strong -fstack-clash-protection -Wformat -Werror=format-security -fcf-protection -fdebug-prefix-map=BUILDDIR=/usr/src/ruby3.3-3.3.7-1ubuntu2 -fPIC -std=c99 -Wno-declaration-after-statement -O2 -g -Winline -Wmissing-noreturn conftest.c  -L. -L/usr/lib/x86_64-linux-gnu -L/workspace/vendor/bundle/ruby/3.3.0/gems/nokogiri-1.18.8/ports/x86_64-linux-gnu/libxml2/2.13.8/lib -L/workspace/vendor/bundle/ruby/3.3.0/gems/nokogiri-1.18.8/ports/x86_64-linux-gnu/libxslt/1.1.43/lib -L/workspace/vendor/bundle/ruby/3.3.0/gems/nokogiri-1.18.8/ext/nokogiri/ports/x86_64-linux-gnu/libgumbo/1.0.0-nokogiri/lib -L. -Wl,-Bsymbolic-functions -Wl,-z,relro -Wl,-z,now -fstack-protector-strong -rdynamic -Wl,-export-dynamic -Wl,--no-as-needed    /workspace/vendor/bundle/ruby/3.3.0/gems/nokogiri-1.18.8/ports/x86_64-linux-gnu/libxslt/1.1.43/lib/libexslt.a -lm -lz /workspace/vendor/bundle/ruby/3.3.0/gems/nokogiri-1.18.8/ports/x86_64-linux-gnu/libxml2/2.13.8/lib/libxml2.a /workspace/vendor/bundle/ruby/3.3.0/gems/nokogiri-1.18.8/ports/x86_64-linux-gnu/libxslt/1.1.43/lib/libxslt.a -lm -lz /workspace/vendor/bundle/ruby/3.3.0/gems/nokogiri-1.18.8/ports/x86_64-linux-gnu/libxml2/2.13.8/lib/libxml2.a /workspace/vendor/bundle/ruby/3.3.0/gems/nokogiri-1.18.8/ext/nokogiri/ports/x86_64-linux-gnu/libgumbo/1.0.0-nokogiri/lib/libgumbo.a -lruby-3.3 /workspace/vendor/bundle/ruby/3.3.0/gems/nokogiri-1.18.8/ports/x86_64-linux-gnu/libxslt/1.1.43/lib/libexslt.a -lm -lz /workspace/vendor/bundle/ruby/3.3.0/gems/nokogiri-1.18.8/ports/x86_64-linux-gnu/libxml2/2.13.8/lib/libxml2.a /workspace/vendor/bundle/ruby/3.3.0/gems/nokogiri-1.18.8/ports/x86_64-linux-gnu/libxslt/1.1.43/lib/libxslt.a -lm -lz /workspace/vendor/bundle/ruby/3.3.0/gems/nokogiri-1.18.8/ports/x86_64-linux-gnu/libxml2/2.13.8/lib/libxml2.a /workspace/vendor/bundle/ruby/3.3.0/gems/nokogiri-1.18.8/ext/nokogiri/ports/x86_64-linux-gnu/libgumbo/1.0.0-nokogiri/lib/libgumbo.a -lm -lpthread  -lc"
+checked program was:
+/* begin */
+ 1: #include "ruby.h"
+ 2: 
+ 3: /*top*/
+ 4: extern int t(void);
+ 5: int main(int argc, char **argv)
+ 6: {
+ 7:   if (argc > 1000000) {
+ 8:     int (* volatile tp)(void)=(int (*)(void))&t;
+ 9:     printf("%d", (*tp)());
+10:   }
+11: 
+12:   return !!argv[argc];
+13: }
+14: extern void xmlCtxtSetOptions();
+15: int t(void) { xmlCtxtSetOptions(); return 0; }
+/* end */
+
+--------------------
+
+have_func: checking for xmlCtxtGetOptions()... -------------------- no
+
+LD_LIBRARY_PATH=.:/usr/lib/x86_64-linux-gnu "x86_64-linux-gnu-gcc -o conftest -I/usr/include/x86_64-linux-gnu/ruby-3.3.0 -I/usr/include/ruby-3.3.0/ruby/backward -I/usr/include/ruby-3.3.0 -I. -I/workspace/vendor/bundle/ruby/3.3.0/gems/nokogiri-1.18.8/ports/x86_64-linux-gnu/libxml2/2.13.8/include/libxml2 -I/workspace/vendor/bundle/ruby/3.3.0/gems/nokogiri-1.18.8/ports/x86_64-linux-gnu/libxslt/1.1.43/include -I/workspace/vendor/bundle/ruby/3.3.0/gems/nokogiri-1.18.8/ports/x86_64-linux-gnu/libxml2/2.13.8/include/libxml2 -Wdate-time -D_FORTIFY_SOURCE=3   -DNOKOGIRI_PACKAGED_LIBRARIES -DNOKOGIRI_LIBXML2_PATCHES="\"0001-Remove-script-macro-support.patch 0002-Update-entities-to-remove-handling-of-ssi.patch 0009-allow-wildcard-namespaces.patch 0010-update-config.guess-and-config.sub-for-libxml2.patch 0011-rip-out-libxml2-s-libc_single_threaded-support.patch 0019-xpath-Use-separate-static-hash-table-for-standard-fu.patch\"" -DNOKOGIRI_LIBXSLT_PATCHES="\"0001-update-config.guess-and-config.sub-for-libxslt.patch\"" -I/workspace/vendor/bundle/ruby/3.3.0/gems/nokogiri-1.18.8/ext/nokogiri/ports/x86_64-linux-gnu/libgumbo/1.0.0-nokogiri/include -g -O3 -Werror=implicit-function-declaration -fno-omit-frame-pointer -mno-omit-leaf-frame-pointer -ffile-prefix-map=BUILDDIR=. -fstack-protector-strong -fstack-clash-protection -Wformat -Werror=format-security -fcf-protection -fdebug-prefix-map=BUILDDIR=/usr/src/ruby3.3-3.3.7-1ubuntu2 -fPIC -std=c99 -Wno-declaration-after-statement -O2 -g -Winline -Wmissing-noreturn conftest.c  -L. -L/usr/lib/x86_64-linux-gnu -L/workspace/vendor/bundle/ruby/3.3.0/gems/nokogiri-1.18.8/ports/x86_64-linux-gnu/libxml2/2.13.8/lib -L/workspace/vendor/bundle/ruby/3.3.0/gems/nokogiri-1.18.8/ports/x86_64-linux-gnu/libxslt/1.1.43/lib -L/workspace/vendor/bundle/ruby/3.3.0/gems/nokogiri-1.18.8/ext/nokogiri/ports/x86_64-linux-gnu/libgumbo/1.0.0-nokogiri/lib -L. -Wl,-Bsymbolic-functions -Wl,-z,relro -Wl,-z,now -fstack-protector-strong -rdynamic -Wl,-export-dynamic -Wl,--no-as-needed    /workspace/vendor/bundle/ruby/3.3.0/gems/nokogiri-1.18.8/ports/x86_64-linux-gnu/libxslt/1.1.43/lib/libexslt.a -lm -lz /workspace/vendor/bundle/ruby/3.3.0/gems/nokogiri-1.18.8/ports/x86_64-linux-gnu/libxml2/2.13.8/lib/libxml2.a /workspace/vendor/bundle/ruby/3.3.0/gems/nokogiri-1.18.8/ports/x86_64-linux-gnu/libxslt/1.1.43/lib/libxslt.a -lm -lz /workspace/vendor/bundle/ruby/3.3.0/gems/nokogiri-1.18.8/ports/x86_64-linux-gnu/libxml2/2.13.8/lib/libxml2.a /workspace/vendor/bundle/ruby/3.3.0/gems/nokogiri-1.18.8/ext/nokogiri/ports/x86_64-linux-gnu/libgumbo/1.0.0-nokogiri/lib/libgumbo.a -lruby-3.3 /workspace/vendor/bundle/ruby/3.3.0/gems/nokogiri-1.18.8/ports/x86_64-linux-gnu/libxslt/1.1.43/lib/libexslt.a -lm -lz /workspace/vendor/bundle/ruby/3.3.0/gems/nokogiri-1.18.8/ports/x86_64-linux-gnu/libxml2/2.13.8/lib/libxml2.a /workspace/vendor/bundle/ruby/3.3.0/gems/nokogiri-1.18.8/ports/x86_64-linux-gnu/libxslt/1.1.43/lib/libxslt.a -lm -lz /workspace/vendor/bundle/ruby/3.3.0/gems/nokogiri-1.18.8/ports/x86_64-linux-gnu/libxml2/2.13.8/lib/libxml2.a /workspace/vendor/bundle/ruby/3.3.0/gems/nokogiri-1.18.8/ext/nokogiri/ports/x86_64-linux-gnu/libgumbo/1.0.0-nokogiri/lib/libgumbo.a -lm -lpthread  -lc"
+conftest.c: In function ‘t’:
+conftest.c:14:57: error: ‘xmlCtxtGetOptions’ undeclared (first use in this function)
+   14 | int t(void) { void ((*volatile p)()); p = (void ((*)()))xmlCtxtGetOptions; return !p; }
+      |                                                         ^~~~~~~~~~~~~~~~~
+conftest.c:14:57: note: each undeclared identifier is reported only once for each function it appears in
+checked program was:
+/* begin */
+ 1: #include "ruby.h"
+ 2: 
+ 3: /*top*/
+ 4: extern int t(void);
+ 5: int main(int argc, char **argv)
+ 6: {
+ 7:   if (argc > 1000000) {
+ 8:     int (* volatile tp)(void)=(int (*)(void))&t;
+ 9:     printf("%d", (*tp)());
+10:   }
+11: 
+12:   return !!argv[argc];
+13: }
+14: int t(void) { void ((*volatile p)()); p = (void ((*)()))xmlCtxtGetOptions; return !p; }
+/* end */
+
+LD_LIBRARY_PATH=.:/usr/lib/x86_64-linux-gnu "x86_64-linux-gnu-gcc -o conftest -I/usr/include/x86_64-linux-gnu/ruby-3.3.0 -I/usr/include/ruby-3.3.0/ruby/backward -I/usr/include/ruby-3.3.0 -I. -I/workspace/vendor/bundle/ruby/3.3.0/gems/nokogiri-1.18.8/ports/x86_64-linux-gnu/libxml2/2.13.8/include/libxml2 -I/workspace/vendor/bundle/ruby/3.3.0/gems/nokogiri-1.18.8/ports/x86_64-linux-gnu/libxslt/1.1.43/include -I/workspace/vendor/bundle/ruby/3.3.0/gems/nokogiri-1.18.8/ports/x86_64-linux-gnu/libxml2/2.13.8/include/libxml2 -Wdate-time -D_FORTIFY_SOURCE=3   -DNOKOGIRI_PACKAGED_LIBRARIES -DNOKOGIRI_LIBXML2_PATCHES="\"0001-Remove-script-macro-support.patch 0002-Update-entities-to-remove-handling-of-ssi.patch 0009-allow-wildcard-namespaces.patch 0010-update-config.guess-and-config.sub-for-libxml2.patch 0011-rip-out-libxml2-s-libc_single_threaded-support.patch 0019-xpath-Use-separate-static-hash-table-for-standard-fu.patch\"" -DNOKOGIRI_LIBXSLT_PATCHES="\"0001-update-config.guess-and-config.sub-for-libxslt.patch\"" -I/workspace/vendor/bundle/ruby/3.3.0/gems/nokogiri-1.18.8/ext/nokogiri/ports/x86_64-linux-gnu/libgumbo/1.0.0-nokogiri/include -g -O3 -Werror=implicit-function-declaration -fno-omit-frame-pointer -mno-omit-leaf-frame-pointer -ffile-prefix-map=BUILDDIR=. -fstack-protector-strong -fstack-clash-protection -Wformat -Werror=format-security -fcf-protection -fdebug-prefix-map=BUILDDIR=/usr/src/ruby3.3-3.3.7-1ubuntu2 -fPIC -std=c99 -Wno-declaration-after-statement -O2 -g -Winline -Wmissing-noreturn conftest.c  -L. -L/usr/lib/x86_64-linux-gnu -L/workspace/vendor/bundle/ruby/3.3.0/gems/nokogiri-1.18.8/ports/x86_64-linux-gnu/libxml2/2.13.8/lib -L/workspace/vendor/bundle/ruby/3.3.0/gems/nokogiri-1.18.8/ports/x86_64-linux-gnu/libxslt/1.1.43/lib -L/workspace/vendor/bundle/ruby/3.3.0/gems/nokogiri-1.18.8/ext/nokogiri/ports/x86_64-linux-gnu/libgumbo/1.0.0-nokogiri/lib -L. -Wl,-Bsymbolic-functions -Wl,-z,relro -Wl,-z,now -fstack-protector-strong -rdynamic -Wl,-export-dynamic -Wl,--no-as-needed    /workspace/vendor/bundle/ruby/3.3.0/gems/nokogiri-1.18.8/ports/x86_64-linux-gnu/libxslt/1.1.43/lib/libexslt.a -lm -lz /workspace/vendor/bundle/ruby/3.3.0/gems/nokogiri-1.18.8/ports/x86_64-linux-gnu/libxml2/2.13.8/lib/libxml2.a /workspace/vendor/bundle/ruby/3.3.0/gems/nokogiri-1.18.8/ports/x86_64-linux-gnu/libxslt/1.1.43/lib/libxslt.a -lm -lz /workspace/vendor/bundle/ruby/3.3.0/gems/nokogiri-1.18.8/ports/x86_64-linux-gnu/libxml2/2.13.8/lib/libxml2.a /workspace/vendor/bundle/ruby/3.3.0/gems/nokogiri-1.18.8/ext/nokogiri/ports/x86_64-linux-gnu/libgumbo/1.0.0-nokogiri/lib/libgumbo.a -lruby-3.3 /workspace/vendor/bundle/ruby/3.3.0/gems/nokogiri-1.18.8/ports/x86_64-linux-gnu/libxslt/1.1.43/lib/libexslt.a -lm -lz /workspace/vendor/bundle/ruby/3.3.0/gems/nokogiri-1.18.8/ports/x86_64-linux-gnu/libxml2/2.13.8/lib/libxml2.a /workspace/vendor/bundle/ruby/3.3.0/gems/nokogiri-1.18.8/ports/x86_64-linux-gnu/libxslt/1.1.43/lib/libxslt.a -lm -lz /workspace/vendor/bundle/ruby/3.3.0/gems/nokogiri-1.18.8/ports/x86_64-linux-gnu/libxml2/2.13.8/lib/libxml2.a /workspace/vendor/bundle/ruby/3.3.0/gems/nokogiri-1.18.8/ext/nokogiri/ports/x86_64-linux-gnu/libgumbo/1.0.0-nokogiri/lib/libgumbo.a -lm -lpthread  -lc"
+/usr/bin/ld: /tmp/cc8o2G4i.o: in function `t':
+/workspace/vendor/bundle/ruby/3.3.0/gems/nokogiri-1.18.8/ext/nokogiri/conftest.c:15:(.text+0xb): undefined reference to `xmlCtxtGetOptions'
+collect2: error: ld returned 1 exit status
+checked program was:
+/* begin */
+ 1: #include "ruby.h"
+ 2: 
+ 3: /*top*/
+ 4: extern int t(void);
+ 5: int main(int argc, char **argv)
+ 6: {
+ 7:   if (argc > 1000000) {
+ 8:     int (* volatile tp)(void)=(int (*)(void))&t;
+ 9:     printf("%d", (*tp)());
+10:   }
+11: 
+12:   return !!argv[argc];
+13: }
+14: extern void xmlCtxtGetOptions();
+15: int t(void) { xmlCtxtGetOptions(); return 0; }
+/* end */
+
+--------------------
+
+have_func: checking for xmlSwitchEncodingName()... -------------------- yes
+
+LD_LIBRARY_PATH=.:/usr/lib/x86_64-linux-gnu "x86_64-linux-gnu-gcc -o conftest -I/usr/include/x86_64-linux-gnu/ruby-3.3.0 -I/usr/include/ruby-3.3.0/ruby/backward -I/usr/include/ruby-3.3.0 -I. -I/workspace/vendor/bundle/ruby/3.3.0/gems/nokogiri-1.18.8/ports/x86_64-linux-gnu/libxml2/2.13.8/include/libxml2 -I/workspace/vendor/bundle/ruby/3.3.0/gems/nokogiri-1.18.8/ports/x86_64-linux-gnu/libxslt/1.1.43/include -I/workspace/vendor/bundle/ruby/3.3.0/gems/nokogiri-1.18.8/ports/x86_64-linux-gnu/libxml2/2.13.8/include/libxml2 -Wdate-time -D_FORTIFY_SOURCE=3   -DNOKOGIRI_PACKAGED_LIBRARIES -DNOKOGIRI_LIBXML2_PATCHES="\"0001-Remove-script-macro-support.patch 0002-Update-entities-to-remove-handling-of-ssi.patch 0009-allow-wildcard-namespaces.patch 0010-update-config.guess-and-config.sub-for-libxml2.patch 0011-rip-out-libxml2-s-libc_single_threaded-support.patch 0019-xpath-Use-separate-static-hash-table-for-standard-fu.patch\"" -DNOKOGIRI_LIBXSLT_PATCHES="\"0001-update-config.guess-and-config.sub-for-libxslt.patch\"" -I/workspace/vendor/bundle/ruby/3.3.0/gems/nokogiri-1.18.8/ext/nokogiri/ports/x86_64-linux-gnu/libgumbo/1.0.0-nokogiri/include -g -O3 -Werror=implicit-function-declaration -fno-omit-frame-pointer -mno-omit-leaf-frame-pointer -ffile-prefix-map=BUILDDIR=. -fstack-protector-strong -fstack-clash-protection -Wformat -Werror=format-security -fcf-protection -fdebug-prefix-map=BUILDDIR=/usr/src/ruby3.3-3.3.7-1ubuntu2 -fPIC -std=c99 -Wno-declaration-after-statement -O2 -g -Winline -Wmissing-noreturn conftest.c  -L. -L/usr/lib/x86_64-linux-gnu -L/workspace/vendor/bundle/ruby/3.3.0/gems/nokogiri-1.18.8/ports/x86_64-linux-gnu/libxml2/2.13.8/lib -L/workspace/vendor/bundle/ruby/3.3.0/gems/nokogiri-1.18.8/ports/x86_64-linux-gnu/libxslt/1.1.43/lib -L/workspace/vendor/bundle/ruby/3.3.0/gems/nokogiri-1.18.8/ext/nokogiri/ports/x86_64-linux-gnu/libgumbo/1.0.0-nokogiri/lib -L. -Wl,-Bsymbolic-functions -Wl,-z,relro -Wl,-z,now -fstack-protector-strong -rdynamic -Wl,-export-dynamic -Wl,--no-as-needed    /workspace/vendor/bundle/ruby/3.3.0/gems/nokogiri-1.18.8/ports/x86_64-linux-gnu/libxslt/1.1.43/lib/libexslt.a -lm -lz /workspace/vendor/bundle/ruby/3.3.0/gems/nokogiri-1.18.8/ports/x86_64-linux-gnu/libxml2/2.13.8/lib/libxml2.a /workspace/vendor/bundle/ruby/3.3.0/gems/nokogiri-1.18.8/ports/x86_64-linux-gnu/libxslt/1.1.43/lib/libxslt.a -lm -lz /workspace/vendor/bundle/ruby/3.3.0/gems/nokogiri-1.18.8/ports/x86_64-linux-gnu/libxml2/2.13.8/lib/libxml2.a /workspace/vendor/bundle/ruby/3.3.0/gems/nokogiri-1.18.8/ext/nokogiri/ports/x86_64-linux-gnu/libgumbo/1.0.0-nokogiri/lib/libgumbo.a -lruby-3.3 /workspace/vendor/bundle/ruby/3.3.0/gems/nokogiri-1.18.8/ports/x86_64-linux-gnu/libxslt/1.1.43/lib/libexslt.a -lm -lz /workspace/vendor/bundle/ruby/3.3.0/gems/nokogiri-1.18.8/ports/x86_64-linux-gnu/libxml2/2.13.8/lib/libxml2.a /workspace/vendor/bundle/ruby/3.3.0/gems/nokogiri-1.18.8/ports/x86_64-linux-gnu/libxslt/1.1.43/lib/libxslt.a -lm -lz /workspace/vendor/bundle/ruby/3.3.0/gems/nokogiri-1.18.8/ports/x86_64-linux-gnu/libxml2/2.13.8/lib/libxml2.a /workspace/vendor/bundle/ruby/3.3.0/gems/nokogiri-1.18.8/ext/nokogiri/ports/x86_64-linux-gnu/libgumbo/1.0.0-nokogiri/lib/libgumbo.a -lm -lpthread  -lc"
+conftest.c: In function ‘t’:
+conftest.c:14:57: error: ‘xmlSwitchEncodingName’ undeclared (first use in this function)
+   14 | int t(void) { void ((*volatile p)()); p = (void ((*)()))xmlSwitchEncodingName; return !p; }
+      |                                                         ^~~~~~~~~~~~~~~~~~~~~
+conftest.c:14:57: note: each undeclared identifier is reported only once for each function it appears in
+checked program was:
+/* begin */
+ 1: #include "ruby.h"
+ 2: 
+ 3: /*top*/
+ 4: extern int t(void);
+ 5: int main(int argc, char **argv)
+ 6: {
+ 7:   if (argc > 1000000) {
+ 8:     int (* volatile tp)(void)=(int (*)(void))&t;
+ 9:     printf("%d", (*tp)());
+10:   }
+11: 
+12:   return !!argv[argc];
+13: }
+14: int t(void) { void ((*volatile p)()); p = (void ((*)()))xmlSwitchEncodingName; return !p; }
+/* end */
+
+LD_LIBRARY_PATH=.:/usr/lib/x86_64-linux-gnu "x86_64-linux-gnu-gcc -o conftest -I/usr/include/x86_64-linux-gnu/ruby-3.3.0 -I/usr/include/ruby-3.3.0/ruby/backward -I/usr/include/ruby-3.3.0 -I. -I/workspace/vendor/bundle/ruby/3.3.0/gems/nokogiri-1.18.8/ports/x86_64-linux-gnu/libxml2/2.13.8/include/libxml2 -I/workspace/vendor/bundle/ruby/3.3.0/gems/nokogiri-1.18.8/ports/x86_64-linux-gnu/libxslt/1.1.43/include -I/workspace/vendor/bundle/ruby/3.3.0/gems/nokogiri-1.18.8/ports/x86_64-linux-gnu/libxml2/2.13.8/include/libxml2 -Wdate-time -D_FORTIFY_SOURCE=3   -DNOKOGIRI_PACKAGED_LIBRARIES -DNOKOGIRI_LIBXML2_PATCHES="\"0001-Remove-script-macro-support.patch 0002-Update-entities-to-remove-handling-of-ssi.patch 0009-allow-wildcard-namespaces.patch 0010-update-config.guess-and-config.sub-for-libxml2.patch 0011-rip-out-libxml2-s-libc_single_threaded-support.patch 0019-xpath-Use-separate-static-hash-table-for-standard-fu.patch\"" -DNOKOGIRI_LIBXSLT_PATCHES="\"0001-update-config.guess-and-config.sub-for-libxslt.patch\"" -I/workspace/vendor/bundle/ruby/3.3.0/gems/nokogiri-1.18.8/ext/nokogiri/ports/x86_64-linux-gnu/libgumbo/1.0.0-nokogiri/include -g -O3 -Werror=implicit-function-declaration -fno-omit-frame-pointer -mno-omit-leaf-frame-pointer -ffile-prefix-map=BUILDDIR=. -fstack-protector-strong -fstack-clash-protection -Wformat -Werror=format-security -fcf-protection -fdebug-prefix-map=BUILDDIR=/usr/src/ruby3.3-3.3.7-1ubuntu2 -fPIC -std=c99 -Wno-declaration-after-statement -O2 -g -Winline -Wmissing-noreturn conftest.c  -L. -L/usr/lib/x86_64-linux-gnu -L/workspace/vendor/bundle/ruby/3.3.0/gems/nokogiri-1.18.8/ports/x86_64-linux-gnu/libxml2/2.13.8/lib -L/workspace/vendor/bundle/ruby/3.3.0/gems/nokogiri-1.18.8/ports/x86_64-linux-gnu/libxslt/1.1.43/lib -L/workspace/vendor/bundle/ruby/3.3.0/gems/nokogiri-1.18.8/ext/nokogiri/ports/x86_64-linux-gnu/libgumbo/1.0.0-nokogiri/lib -L. -Wl,-Bsymbolic-functions -Wl,-z,relro -Wl,-z,now -fstack-protector-strong -rdynamic -Wl,-export-dynamic -Wl,--no-as-needed    /workspace/vendor/bundle/ruby/3.3.0/gems/nokogiri-1.18.8/ports/x86_64-linux-gnu/libxslt/1.1.43/lib/libexslt.a -lm -lz /workspace/vendor/bundle/ruby/3.3.0/gems/nokogiri-1.18.8/ports/x86_64-linux-gnu/libxml2/2.13.8/lib/libxml2.a /workspace/vendor/bundle/ruby/3.3.0/gems/nokogiri-1.18.8/ports/x86_64-linux-gnu/libxslt/1.1.43/lib/libxslt.a -lm -lz /workspace/vendor/bundle/ruby/3.3.0/gems/nokogiri-1.18.8/ports/x86_64-linux-gnu/libxml2/2.13.8/lib/libxml2.a /workspace/vendor/bundle/ruby/3.3.0/gems/nokogiri-1.18.8/ext/nokogiri/ports/x86_64-linux-gnu/libgumbo/1.0.0-nokogiri/lib/libgumbo.a -lruby-3.3 /workspace/vendor/bundle/ruby/3.3.0/gems/nokogiri-1.18.8/ports/x86_64-linux-gnu/libxslt/1.1.43/lib/libexslt.a -lm -lz /workspace/vendor/bundle/ruby/3.3.0/gems/nokogiri-1.18.8/ports/x86_64-linux-gnu/libxml2/2.13.8/lib/libxml2.a /workspace/vendor/bundle/ruby/3.3.0/gems/nokogiri-1.18.8/ports/x86_64-linux-gnu/libxslt/1.1.43/lib/libxslt.a -lm -lz /workspace/vendor/bundle/ruby/3.3.0/gems/nokogiri-1.18.8/ports/x86_64-linux-gnu/libxml2/2.13.8/lib/libxml2.a /workspace/vendor/bundle/ruby/3.3.0/gems/nokogiri-1.18.8/ext/nokogiri/ports/x86_64-linux-gnu/libgumbo/1.0.0-nokogiri/lib/libgumbo.a -lm -lpthread  -lc"
+checked program was:
+/* begin */
+ 1: #include "ruby.h"
+ 2: 
+ 3: /*top*/
+ 4: extern int t(void);
+ 5: int main(int argc, char **argv)
+ 6: {
+ 7:   if (argc > 1000000) {
+ 8:     int (* volatile tp)(void)=(int (*)(void))&t;
+ 9:     printf("%d", (*tp)());
+10:   }
+11: 
+12:   return !!argv[argc];
+13: }
+14: extern void xmlSwitchEncodingName();
+15: int t(void) { xmlSwitchEncodingName(); return 0; }
+/* end */
+
+--------------------
+
+have_func: checking for rb_category_warning()... -------------------- yes
+
+LD_LIBRARY_PATH=.:/usr/lib/x86_64-linux-gnu "x86_64-linux-gnu-gcc -o conftest -I/usr/include/x86_64-linux-gnu/ruby-3.3.0 -I/usr/include/ruby-3.3.0/ruby/backward -I/usr/include/ruby-3.3.0 -I. -I/workspace/vendor/bundle/ruby/3.3.0/gems/nokogiri-1.18.8/ports/x86_64-linux-gnu/libxml2/2.13.8/include/libxml2 -I/workspace/vendor/bundle/ruby/3.3.0/gems/nokogiri-1.18.8/ports/x86_64-linux-gnu/libxslt/1.1.43/include -I/workspace/vendor/bundle/ruby/3.3.0/gems/nokogiri-1.18.8/ports/x86_64-linux-gnu/libxml2/2.13.8/include/libxml2 -Wdate-time -D_FORTIFY_SOURCE=3   -DNOKOGIRI_PACKAGED_LIBRARIES -DNOKOGIRI_LIBXML2_PATCHES="\"0001-Remove-script-macro-support.patch 0002-Update-entities-to-remove-handling-of-ssi.patch 0009-allow-wildcard-namespaces.patch 0010-update-config.guess-and-config.sub-for-libxml2.patch 0011-rip-out-libxml2-s-libc_single_threaded-support.patch 0019-xpath-Use-separate-static-hash-table-for-standard-fu.patch\"" -DNOKOGIRI_LIBXSLT_PATCHES="\"0001-update-config.guess-and-config.sub-for-libxslt.patch\"" -I/workspace/vendor/bundle/ruby/3.3.0/gems/nokogiri-1.18.8/ext/nokogiri/ports/x86_64-linux-gnu/libgumbo/1.0.0-nokogiri/include -g -O3 -Werror=implicit-function-declaration -fno-omit-frame-pointer -mno-omit-leaf-frame-pointer -ffile-prefix-map=BUILDDIR=. -fstack-protector-strong -fstack-clash-protection -Wformat -Werror=format-security -fcf-protection -fdebug-prefix-map=BUILDDIR=/usr/src/ruby3.3-3.3.7-1ubuntu2 -fPIC -std=c99 -Wno-declaration-after-statement -O2 -g -Winline -Wmissing-noreturn conftest.c  -L. -L/usr/lib/x86_64-linux-gnu -L/workspace/vendor/bundle/ruby/3.3.0/gems/nokogiri-1.18.8/ports/x86_64-linux-gnu/libxml2/2.13.8/lib -L/workspace/vendor/bundle/ruby/3.3.0/gems/nokogiri-1.18.8/ports/x86_64-linux-gnu/libxslt/1.1.43/lib -L/workspace/vendor/bundle/ruby/3.3.0/gems/nokogiri-1.18.8/ext/nokogiri/ports/x86_64-linux-gnu/libgumbo/1.0.0-nokogiri/lib -L. -Wl,-Bsymbolic-functions -Wl,-z,relro -Wl,-z,now -fstack-protector-strong -rdynamic -Wl,-export-dynamic -Wl,--no-as-needed    /workspace/vendor/bundle/ruby/3.3.0/gems/nokogiri-1.18.8/ports/x86_64-linux-gnu/libxslt/1.1.43/lib/libexslt.a -lm -lz /workspace/vendor/bundle/ruby/3.3.0/gems/nokogiri-1.18.8/ports/x86_64-linux-gnu/libxml2/2.13.8/lib/libxml2.a /workspace/vendor/bundle/ruby/3.3.0/gems/nokogiri-1.18.8/ports/x86_64-linux-gnu/libxslt/1.1.43/lib/libxslt.a -lm -lz /workspace/vendor/bundle/ruby/3.3.0/gems/nokogiri-1.18.8/ports/x86_64-linux-gnu/libxml2/2.13.8/lib/libxml2.a /workspace/vendor/bundle/ruby/3.3.0/gems/nokogiri-1.18.8/ext/nokogiri/ports/x86_64-linux-gnu/libgumbo/1.0.0-nokogiri/lib/libgumbo.a -lruby-3.3 /workspace/vendor/bundle/ruby/3.3.0/gems/nokogiri-1.18.8/ports/x86_64-linux-gnu/libxslt/1.1.43/lib/libexslt.a -lm -lz /workspace/vendor/bundle/ruby/3.3.0/gems/nokogiri-1.18.8/ports/x86_64-linux-gnu/libxml2/2.13.8/lib/libxml2.a /workspace/vendor/bundle/ruby/3.3.0/gems/nokogiri-1.18.8/ports/x86_64-linux-gnu/libxslt/1.1.43/lib/libxslt.a -lm -lz /workspace/vendor/bundle/ruby/3.3.0/gems/nokogiri-1.18.8/ports/x86_64-linux-gnu/libxml2/2.13.8/lib/libxml2.a /workspace/vendor/bundle/ruby/3.3.0/gems/nokogiri-1.18.8/ext/nokogiri/ports/x86_64-linux-gnu/libgumbo/1.0.0-nokogiri/lib/libgumbo.a -lm -lpthread  -lc"
+checked program was:
+/* begin */
+ 1: #include "ruby.h"
+ 2: 
+ 3: /*top*/
+ 4: extern int t(void);
+ 5: int main(int argc, char **argv)
+ 6: {
+ 7:   if (argc > 1000000) {
+ 8:     int (* volatile tp)(void)=(int (*)(void))&t;
+ 9:     printf("%d", (*tp)());
+10:   }
+11: 
+12:   return !!argv[argc];
+13: }
+14: int t(void) { void ((*volatile p)()); p = (void ((*)()))rb_category_warning; return !p; }
+/* end */
+
+--------------------
+
+append_cppflags: checking for whether -DNOKOGIRI_OTHER_LIBRARY_VERSIONS="\"libgumbo:1.0.0-nokogiri\"" is accepted as CPPFLAGS... -------------------- yes
+
+LD_LIBRARY_PATH=.:/usr/lib/x86_64-linux-gnu "x86_64-linux-gnu-gcc -I/usr/include/x86_64-linux-gnu/ruby-3.3.0 -I/usr/include/ruby-3.3.0/ruby/backward -I/usr/include/ruby-3.3.0 -I. -I/workspace/vendor/bundle/ruby/3.3.0/gems/nokogiri-1.18.8/ports/x86_64-linux-gnu/libxml2/2.13.8/include/libxml2 -I/workspace/vendor/bundle/ruby/3.3.0/gems/nokogiri-1.18.8/ports/x86_64-linux-gnu/libxslt/1.1.43/include -I/workspace/vendor/bundle/ruby/3.3.0/gems/nokogiri-1.18.8/ports/x86_64-linux-gnu/libxml2/2.13.8/include/libxml2 -Wdate-time -D_FORTIFY_SOURCE=3   -DNOKOGIRI_PACKAGED_LIBRARIES -DNOKOGIRI_LIBXML2_PATCHES="\"0001-Remove-script-macro-support.patch 0002-Update-entities-to-remove-handling-of-ssi.patch 0009-allow-wildcard-namespaces.patch 0010-update-config.guess-and-config.sub-for-libxml2.patch 0011-rip-out-libxml2-s-libc_single_threaded-support.patch 0019-xpath-Use-separate-static-hash-table-for-standard-fu.patch\"" -DNOKOGIRI_LIBXSLT_PATCHES="\"0001-update-config.guess-and-config.sub-for-libxslt.patch\"" -I/workspace/vendor/bundle/ruby/3.3.0/gems/nokogiri-1.18.8/ext/nokogiri/ports/x86_64-linux-gnu/libgumbo/1.0.0-nokogiri/include -g -O3 -Werror=implicit-function-declaration -fno-omit-frame-pointer -mno-omit-leaf-frame-pointer -ffile-prefix-map=BUILDDIR=. -fstack-protector-strong -fstack-clash-protection -Wformat -Werror=format-security -fcf-protection -fdebug-prefix-map=BUILDDIR=/usr/src/ruby3.3-3.3.7-1ubuntu2 -fPIC -std=c99 -Wno-declaration-after-statement -O2 -g -Winline -Wmissing-noreturn  -DNOKOGIRI_OTHER_LIBRARY_VERSIONS="\"libgumbo:1.0.0-nokogiri\"" -Werror -c conftest.c"
+checked program was:
+/* begin */
+1: #include "ruby.h"
+2: 
+3: int main(int argc, char **argv)
+4: {
+5:   return !!argv[argc];
+6: }
+/* end */
+
+--------------------
+

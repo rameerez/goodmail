@@ -1,3 +1,4 @@
+# /.bundle/ is already ignored
 /.bundle/
 /.yardoc
 /_yardoc/
@@ -10,3 +11,7 @@
 .cursor
 
 /dist/
++vendor/
++vendor/bundle/
++test/tmp/
++test/reports/

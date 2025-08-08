@@ -1,7 +1,7 @@
 PATH
   remote: .
   specs:
-    goodmail (0.1.0)
+    goodmail (0.3.0)
       premailer-rails (>= 1.10)
       rails (>= 7.0)
       rails-html-sanitizer (>= 1.0)
@@ -82,6 +82,7 @@ GEM
       uri (>= 0.13.1)
     addressable (2.8.7)
       public_suffix (>= 2.0.2, < 7.0)
+    ansi (1.5.0)
     base64 (0.2.0)
     benchmark (0.4.0)
     bigdecimal (3.1.9)
@@ -93,6 +94,7 @@ GEM
     css_parser (1.21.1)
       addressable
     date (3.4.1)
+    docile (1.4.1)
     drb (2.2.1)
     erubi (1.13.1)
     globalid (1.2.1)
@@ -119,6 +121,11 @@ GEM
     mini_mime (1.1.5)
     mini_portile2 (2.8.8)
     minitest (5.25.5)
+    minitest-reporters (1.7.1)
+      ansi
+      builder
+      minitest (>= 5.0)
+      ruby-progressbar
     net-imap (0.5.8)
       date
       net-protocol
@@ -195,7 +202,14 @@ GEM
       psych (>= 4.0.0)
     reline (0.6.1)
       io-console (~> 0.5)
+    ruby-progressbar (1.13.0)
     securerandom (0.4.1)
+    simplecov (0.22.0)
+      docile (~> 1.1)
+      simplecov-html (~> 0.11)
+      simplecov_json_formatter (~> 0.1)
+    simplecov-html (0.13.2)
+    simplecov_json_formatter (0.1.4)
     stringio (3.1.7)
     thor (1.3.2)
     timeout (0.4.3)
@@ -216,8 +230,11 @@ PLATFORMS
 DEPENDENCIES
   goodmail!
   irb
+  minitest (>= 5.20)
+  minitest-reporters (>= 1.6)
   pry
   rake (~> 13.0)
+  simplecov (>= 0.22)
 
 BUNDLED WITH
    2.6.4
