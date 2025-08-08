@@ -43,4 +43,8 @@ Gem::Specification.new do |spec|
   # guide at: https://bundler.io/guides/creating_gem.html
   spec.add_development_dependency "pry"
   spec.add_development_dependency "rake", "~> 13.0"
+  # Test and coverage
+  spec.add_development_dependency "minitest", ">= 5.20"
+  spec.add_development_dependency "minitest-reporters", ">= 1.6"
+  spec.add_development_dependency "simplecov", ">= 0.22"
 end
