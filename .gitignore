@@ -11,7 +11,7 @@
 .cursor
 
 /dist/
-+vendor/
-+vendor/bundle/
-+test/tmp/
-+test/reports/
+vendor/
+vendor/bundle/
+test/tmp/
+test/reports/
