@@ -39,6 +39,7 @@ module Goodmail
       @config = DEFAULT_CONFIG.dup unless defined?(@config) && @config
       @config
     end
+    alias_method :configuration, :config
 
     # Resets the configuration back to the default values.
     # Primarily useful for testing environments.
