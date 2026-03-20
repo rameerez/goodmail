@@ -234,6 +234,41 @@ end
 *   **Purpose**: `Goodmail.render` is primarily for generating and retrieving processed email content parts. `Goodmail.compose` is for generating a complete, deliverable `Mail::Message` object.
 *   **List-Unsubscribe Header**: `Goodmail.render` itself does *not* add the `List-Unsubscribe` header to any mail object (as it doesn't create one). If you use `Goodmail.render`, you are responsible for adding this header to your `Mail::Message` object if an `unsubscribe_url` was effectively used during rendering (either passed to `Goodmail.render` or taken from global config) and you require this header. The internal `Goodmail::Mailer` (used by `Goodmail.compose`) handles adding this header automatically to the `Mail::Message` object it builds.
 
+### Integrating with the Pay Gem
+
+Goodmail works seamlessly with the [Pay gem](https://github.com/pay-rails/pay) to send beautiful transactional emails for payment notifications (receipts, refunds, subscription updates, etc.).
+
+Since Pay allows you to configure a custom mailer class, you can create a mailer that uses `Goodmail.render` to generate beautiful email content for all Pay notifications.
+
+In the examples below, app-defined mailers that use Goodmail follow the `*Goodmailer` suffix convention. This is just a naming convention for clarity, not a requirement imposed by Goodmail itself.
+
+**Quick Setup:**
+
+1. Copy the example mailer from [`examples/pay_goodmailer.rb`](examples/pay_goodmailer.rb) to your Rails app at `app/mailers/pay_goodmailer.rb`
+
+2. Configure Pay to use the custom mailer in `config/initializers/pay.rb`:
+
+```ruby
+Pay.setup do |config|
+  config.parent_mailer = "ApplicationMailer"
+  config.mailer = "PayGoodmailer"
+  # ... other Pay configuration
+end
+```
+
+3. Customize the email content and URLs in the mailer to match your app
+
+The example implementation includes all Pay notification types:
+- `receipt` - Payment receipts
+- `refund` - Refund confirmations
+- `subscription_renewing` - Renewal reminders
+- `payment_action_required` - Payment action needed
+- `subscription_trial_will_end` - Trial ending soon
+- `subscription_trial_ended` - Trial has ended
+- `payment_failed` - Failed payment alerts
+
+Each method uses `Goodmail.render` to create beautiful, consistent emails that match your brand.
+
 ### Adding Unsubscribe Functionality
 
 Goodmail helps you add the `List-Unsubscribe` header and an optional visible link, but **you must provide the actual URL** where users can unsubscribe.
