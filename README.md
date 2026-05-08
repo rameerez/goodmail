@@ -162,13 +162,18 @@ Inside the `Goodmail.compose` block, you have access to these methods:
 
 *   `h1(text)`, `h2(text)`, `h3(text)`: Styled heading tags.
 *   `text(string)`: A paragraph of text. Allows simple inline `<a>` tags with `href` attributes; other HTML is stripped for safety. Handles `\n` for line breaks.
+*   `link(link_text, url)`: An inline styled link, rendered in the configured `brand_color`. Cleaner than hand-writing `<a>` tags inside `text` blocks when the whole paragraph is the link.
+*   `small(string)`: A small grey paragraph for fine print, legal disclaimers and "you are receiving this because…" footers.
 *   `button(link_text, url)`: A prominent, styled call-to-action button (includes Outlook VML fallback).
 *   `image(src, alt = "", width: nil, height: nil)`: Embeds an image, centered by default (includes Outlook MSO fallback). Uses `config.company_name` for alt text if none provided.
+*   `attach(filename, content, mime_type: nil, inline: false)`: Attaches a binary file (PDF, .ics, .csv, image…) to the outgoing email. `content` can be raw bytes or a filesystem path — when the string matches an existing file it is read for you. Pass `inline: true` to send the part with `Content-Disposition: inline` so the body can reference it via `cid:FILENAME`.
+*   `inline_image(filename, content, alt: "", width: nil, height: nil, mime_type: nil)`: Convenience helper that registers an inline-disposition attachment AND emits the matching `<img src="cid:FILENAME">` tag at that point in the email body. Use when you need the image to travel with the email (no public hosting available, offline reading, etc.); when you already have a public URL prefer `image(src, alt)` — it's lighter on the wire.
 *   `space(pixels = 16)`: Adds vertical whitespace.
 *   `line`: Adds a horizontal rule (`<hr>`).
 *   `center { ... }`: Centers the content generated within the block.
 *   `code_box(text)`: Displays text centered and bold within a styled box (grey background, padding, italic). Text is HTML-escaped.
-*   `price_row(name, price)`: Adds a styled paragraph showing a name and price, separated by a top border (e.g., for simple receipt line items). Text is HTML-escaped.
+*   `price_row(name, price)`: Adds a styled paragraph showing a name and price, separated by a top border (e.g., for simple receipt line items). Both the name and the price render bold and centered — meant for cases where label and amount carry equal weight. Text is HTML-escaped.
+*   `info_row(label, value)`: Adds a label/value row using the email-safe two-column table pattern (muted label on the left, dark right-aligned value on the right, 1px hairline at the bottom). Use this when the LABEL is supporting context and the VALUE is the primary content ("Distance — 18 km", "Driver — Lola Garcia"). Stack multiple consecutive `info_row` calls to build a clean info card. Text is HTML-escaped.
 *   `sign(name = Goodmail.config.company_name)`: Adds a standard closing signature line.
 *   `html(raw_html_string)`: **Use with extreme caution.** Allows embedding raw, *un-sanitized* HTML.
 
@@ -178,9 +183,10 @@ For more advanced use cases, such as integrating Goodmail's content generation i
 
 This method processes your DSL block, applies the layout, runs Premailer for CSS inlining, and performs plain text cleanup, similar to `Goodmail.compose`. However, instead of returning a `Mail::Message` object ready for delivery, it returns a `Goodmail::EmailParts` struct.
 
-The `Goodmail::EmailParts` struct (defined in `goodmail/email.rb`) has two attributes:
+The `Goodmail::EmailParts` struct (defined in `goodmail/email.rb`) has three attributes:
 *   `html`: The final, inlined HTML content for your email.
 *   `text`: The cleaned-up plain text version of your email.
+*   `attachments`: An array of `{ filename:, content:, mime_type:, inline: }` hashes for every `attach` / `inline_image` call inside the DSL block. Empty array when the DSL didn't register any attachments. You're responsible for handing these to ActionMailer's `attachments` hash — see the example below.
 
 **How to use it:**
 
@@ -217,6 +223,22 @@ end
 # ensuring only standard mail headers are passed.
 action_mailer_headers = mail_rendering_headers.slice(:to, :from, :subject, :cc, :bcc, :reply_to)
 
+# Hand any `attach` / `inline_image` parts off to ActionMailer's
+# attachments hash. Two important points:
+#   - `attachments.inline[]=` is the right setter for inline parts.
+#   - For inline parts, pin the Content-ID to the filename so the
+#     `<img src="cid:FILENAME">` reference rendered into `parts.html`
+#     by `inline_image` resolves to THIS part. Without this, Mail gem
+#     auto-generates a globally-unique Content-ID and the image renders
+#     as a broken icon. (The `Goodmail.compose` path handles this
+#     automatically; the render path is up to you.)
+parts.attachments.each do |attachment|
+  target = attachment[:inline] ? attachments.inline : attachments
+  payload = attachment[:mime_type] ? { mime_type: attachment[:mime_type], content: attachment[:content] } : attachment[:content]
+  target[attachment[:filename]] = payload
+  attachments[attachment[:filename]].content_id = "<#{attachment[:filename]}>" if attachment[:inline]
+end
+
 # Now use these parts in ActionMailer's mail method
 # You might also want to add the List-Unsubscribe header manually here if needed.
 final_mail_object = mail(action_mailer_headers) do |format|
@@ -232,7 +254,17 @@ end
 
 *   **Return Value**: `Goodmail.render` returns an instance of `Goodmail::EmailParts` (e.g., `EmailParts.new(html: "...", text: "...")`). `Goodmail.compose` returns a `Mail::Message` object.
 *   **Purpose**: `Goodmail.render` is primarily for generating and retrieving processed email content parts. `Goodmail.compose` is for generating a complete, deliverable `Mail::Message` object.
-*   **List-Unsubscribe Header**: `Goodmail.render` itself does *not* add the `List-Unsubscribe` header to any mail object (as it doesn't create one). If you use `Goodmail.render`, you are responsible for adding this header to your `Mail::Message` object if an `unsubscribe_url` was effectively used during rendering (either passed to `Goodmail.render` or taken from global config) and you require this header. The internal `Goodmail::Mailer` (used by `Goodmail.compose`) handles adding this header automatically to the `Mail::Message` object it builds.
+*   **List-Unsubscribe Headers**: `Goodmail.render` itself does *not* add the `List-Unsubscribe` or `List-Unsubscribe-Post` headers to any mail object (as it doesn't create one). If you use `Goodmail.render` you are responsible for adding both headers to your `Mail::Message` object when an `unsubscribe_url` was effectively used during rendering. Recommended snippet:
+
+    ```ruby
+    if (unsubscribe_url = mail_rendering_headers[:unsubscribe_url] || Goodmail.config.unsubscribe_url).present?
+      action_mailer_headers["List-Unsubscribe"]      = "<#{unsubscribe_url}>"
+      action_mailer_headers["List-Unsubscribe-Post"] = "List-Unsubscribe=One-Click"
+    end
+    ```
+
+    The internal `Goodmail::Mailer` (used by `Goodmail.compose`) sets both headers automatically. Gmail's and Yahoo's [bulk-sender requirements](https://support.google.com/mail/answer/81126) treat the missing one-click pair as a spam signal — if you skip this on a production sender, expect mid-volume deliverability drops.
+*   **Attachments + inline images**: `Goodmail.render` collects every `attach` / `inline_image` call into `parts.attachments`. The example above shows the canonical fan-out (including the Content-ID pin for inline images, which Mail gem auto-generates incorrectly otherwise). `Goodmail.compose` handles both for you.
 
 ### Integrating with the Pay Gem
 
@@ -284,7 +316,7 @@ Goodmail helps you add the `List-Unsubscribe` header and an optional visible lin
       # ... other headers ...
     ) do # ...
     ```
-    *If an `unsubscribe_url` is provided, Goodmail adds the `List-Unsubscribe` header.*
+    *If an `unsubscribe_url` is provided, Goodmail adds both the `List-Unsubscribe` and the RFC 8058 `List-Unsubscribe-Post: List-Unsubscribe=One-Click` headers. Gmail's and Yahoo's [bulk-sender requirements](https://support.google.com/mail/answer/81126) (Feb 2024+) treat missing one-click unsubscribe as a spam signal — Goodmail handles this for you. Your URL just needs to accept the magic POST body `List-Unsubscribe=One-Click` (or, if you haven't built the endpoint yet, a plain GET still works as a fallback).*
 
 2.  **Optionally Show Footer Link:**
     *   Set `config.show_footer_unsubscribe_link = true`.
@@ -303,7 +335,9 @@ Goodmail helps you add the `List-Unsubscribe` header and an optional visible lin
 
 ## Development
 
-After checking out the repo, run `bin/setup` to install dependencies. Then, run `rake spec` to run the tests. You can also run `bin/console` for an interactive prompt that will allow you to experiment.
+After checking out the repo, run `bin/setup` to install dependencies. Then, run `rake test` to run the test suite (Minitest 6+, no Rails app required — every code path is exercised in isolation through `Goodmail.compose` / `Goodmail.render`). You can also run `bin/console` for an interactive prompt that will allow you to experiment.
+
+To check line coverage, run `COVERAGE=1 rake test` and open `coverage/index.html`. The suite ships with 100% line coverage as a baseline; if you add a method, add a test for it.
 
 To install this gem onto your local machine, run `bundle exec rake install`.
 

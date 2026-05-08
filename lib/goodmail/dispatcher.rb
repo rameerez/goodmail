@@ -36,11 +36,21 @@ module Goodmail
       mailer_headers = slice_mail_headers(headers)
 
       # 7. Build the mail object via the internal Mailer class action.
+      #    Attachments collected via the `attach` / `inline_image` DSL helpers
+      #    flow through here so the Mailer can register them with Action
+      #    Mailer's attachments hash before the `mail()` call.
+      #
+      #    The `preheader` is forwarded so `Goodmail::Plaintext` can strip
+      #    the inbox-preview text from the plaintext part if it leaks
+      #    through Premailer's extractor (which doesn't honor the hidden
+      #    span's `display: none`).
       delivery_object = Goodmail::Mailer.compose_message(
         mailer_headers,
         raw_html_body,
         nil, # Pass nil for raw_text_body - Premailer generates it
-        unsubscribe_url
+        unsubscribe_url,
+        builder.attachments,
+        preheader: preheader
       )
 
       # 8. Return the ActionMailer::MessageDelivery object

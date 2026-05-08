@@ -3,8 +3,24 @@ require "premailer"
 require "cgi" # For unescaping HTML in plaintext generation (though Premailer might handle most)
 
 module Goodmail
-  # Simple struct to hold the rendered HTML and text parts of an email.
-  EmailParts = Struct.new(:html, :text, keyword_init: true)
+  # Simple struct to hold the rendered HTML and text parts of an email,
+  # plus any attachments collected via the `attach` / `inline_image` DSL
+  # helpers. Callers using `Goodmail.render` (typically a custom mailer
+  # subclass that wants to call `mail()` itself) can fan attachments out
+  # to ActionMailer's `attachments` hash with a small loop:
+  #
+  #   parts.attachments.each do |a|
+  #     target = a[:inline] ? attachments.inline : attachments
+  #     target[a[:filename]] = a[:mime_type] ? { mime_type: a[:mime_type], content: a[:content] } : a[:content]
+  #   end
+  #
+  # `attachments` defaults to `[]` for backwards compatibility — callers
+  # written against 0.3.x keep working unchanged.
+  EmailParts = Struct.new(:html, :text, :attachments, keyword_init: true) do
+    def initialize(html: nil, text: nil, attachments: [])
+      super(html: html, text: text, attachments: attachments || [])
+    end
+  end
 
   # Renders the email content using the Goodmail DSL and returns HTML and text parts.
   # This method does not send the email but prepares its content for sending.
@@ -35,37 +51,31 @@ module Goodmail
       preheader: preheader
     )
 
-    # 4. Use Premailer to inline CSS and generate plaintext
+    # 4. Run Premailer for CSS inlining (HTML part). Plaintext goes
+    #    through `Goodmail::Plaintext` which pre-processes the source
+    #    HTML to neutralize MSO-only markup and the hidden preheader
+    #    span — both of which Premailer's plaintext extractor would
+    #    otherwise leak into the text body.
     premailer = Premailer.new(
       raw_html_body,
       with_html_string: true,
       adapter: :nokogiri,
       preserve_styles: false, # Force inlining and remove <style> block
       remove_ids: true,       # Remove IDs
-      remove_comments: false  # Keep MSO conditional comments
+      remove_comments: false, # Keep MSO conditional comments in HTML
+      input_encoding: "UTF-8" # See Goodmail::Plaintext for the full
+                              # rationale — short version: Premailer
+                              # double-encodes accented characters when
+                              # the source has no <meta charset>.
     )
-
     final_inlined_html = premailer.to_inline_css
-    generated_plain_text = premailer.to_plain_text
+    final_plain_text = Goodmail::Plaintext.generate(raw_html_body, preheader: preheader)
 
-    # 5. Perform refined plaintext cleanup (ported from Goodmail::Mailer)
-    # 5.1. Remove logo alt text line (if logo exists and has associated URL)
-    if Goodmail.config.logo_url.present? && Goodmail.config.company_url.present? && Goodmail.config.company_name.present?
-      company_name_escaped = Regexp.escape(Goodmail.config.company_name)
-      company_url_escaped = Regexp.escape(Goodmail.config.company_url)
-      # Regex to match the typical alt text pattern for a linked logo image
-      logo_alt_pattern = /^\s*#{company_name_escaped}\s+Logo\s*\(.*?#{company_url_escaped}.*?\).*\n?/i
-      generated_plain_text.gsub!(logo_alt_pattern, "")
-    end
-
-    # 5.2. Remove any remaining standalone URL lines (often from logo links or similar artifacts)
-    # This targets lines that consist *only* of a URL.
-    generated_plain_text.gsub!(/^\s*https?:\/\/\S+\s*$\n?/i, "")
-
-    # 5.3. Compact excess blank lines (more than two consecutive newlines)
-    generated_plain_text.gsub!(/\n{3,}/, "\n\n")
-
-    # 6. Return the structured parts
-    EmailParts.new(html: final_inlined_html, text: generated_plain_text.strip)
+    # 5. Return the structured parts
+    EmailParts.new(
+      html: final_inlined_html,
+      text: final_plain_text,
+      attachments: builder.attachments
+    )
   end
 end

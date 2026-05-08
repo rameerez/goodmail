@@ -5,8 +5,10 @@
 /doc/
 /pkg/
 /spec/reports/
+/test/reports/
 /tmp/
 
 .cursor
+.claude
 
 /dist/
