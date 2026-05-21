@@ -185,7 +185,8 @@ Inside the `Goodmail.compose` block, you have access to these methods:
 
 ### Advanced: Rendering Email Parts with `Goodmail.render`
 
-For more advanced use cases, such as integrating Goodmail's content generation into existing mailer workflows (like Devise mailers) or when you need direct access to the generated HTML and plain text parts before sending, Goodmail provides the `Goodmail.render` method.
+For advanced use cases where you need direct access to the generated HTML and
+plain text parts before sending, Goodmail provides the `Goodmail.render` method.
 
 This method processes your DSL block, applies the layout, runs Premailer for CSS inlining, and performs plain text cleanup, similar to `Goodmail.compose`. However, instead of returning an `ActionMailer::MessageDelivery` ready for delivery, it returns a `Goodmail::EmailParts` struct.
 
@@ -201,15 +202,12 @@ When Goodmail is loaded, Rails mailers get three private helpers automatically:
 `goodmail_render_parts` + `goodmail_mail_parts` when you need to render first.
 
 ```ruby
-# In your custom mailer (e.g., a Devise mailer override)
+# In your custom mailer, including framework overrides such as Devise or Pay
 
 # Define your headers (to, from, subject, etc.)
-# The :subject is crucial for Goodmail.render.
-# You can also pass :unsubscribe_url and :preheader to Goodmail.render
-# to override global configurations for that specific email.
-# Note: these Goodmail-specific keys will be used by Goodmail.render
-# and should not be passed directly to ActionMailer's mail() method
-# if they are not standard mail headers.
+# You can pass :unsubscribe_url, :preheader, :locale, :config, and
+# :layout_path in the same hash. Goodmail uses them for rendering and strips
+# them before calling Action Mailer's mail().
 class NotificationMailer < ApplicationMailer
   def important_update(recipient)
     details_url = view_details_url(recipient)
@@ -240,8 +238,27 @@ Goodmail render options such as `preheader:`, `unsubscribe_url:`, `locale:`,
 The block keeps normal mailer context: instance variables and private mailer
 helpers are available, and `locale:` wraps the DSL block in `I18n.with_locale`.
 
-If you need to render first (for example Devise, Pay, or a mailer that
-temporarily swaps branding config), use the lower-level helpers:
+Framework mailers can also pass their native header hash directly. For example,
+a Devise override can keep Devise's own `headers_for(...)` output as the single
+source of truth and let Goodmail handle only the body/render mechanics:
+
+```ruby
+class DeviseGoodmailer < Devise::Mailer
+  def confirmation_instructions(record, token, opts = {})
+    @token = token
+    initialize_from_record(record)
+
+    goodmail_mail(headers_for(:confirmation_instructions, opts), locale: record.locale) do
+      text "Confirm your account below."
+      button "Confirm my account", confirmation_url(record, confirmation_token: token)
+      sign
+    end
+  end
+end
+```
+
+If you truly need to render first because another step must inspect or mutate
+the generated parts before sending, use the lower-level helpers:
 
 ```ruby
 class CustomMailer < ApplicationMailer
@@ -309,7 +326,9 @@ The example implementation includes all Pay notification types:
 - `subscription_trial_ended` - Trial has ended
 - `payment_failed` - Failed payment alerts
 
-Each method uses `goodmail_render_parts` and `goodmail_mail_parts` so Pay-specific setup stays in the app while Goodmail owns the render-to-Action-Mailer handoff.
+Each method uses `goodmail_mail(pay_mail_arguments, ...)` so Pay-specific
+recipient/header setup stays in the app while Goodmail owns rendering,
+attachments, multipart assembly, and unsubscribe headers.
 
 ### Adding Unsubscribe Functionality
 

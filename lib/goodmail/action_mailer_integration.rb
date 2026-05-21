@@ -140,8 +140,8 @@ module Goodmail
       end
     end
 
-    # Context-aware render helper for mailers that need to render first and
-    # call `mail()` later (Devise, Pay, temporary whitelabel config swaps).
+    # Context-aware render helper for mailers that truly need to render first
+    # and inspect or mutate generated parts before calling `mail()` later.
     # It injects the current mailer as the Goodmail render context so app code
     # does not need to repeat `Goodmail.render(..., context: self)` everywhere.
     # Source:
@@ -156,10 +156,9 @@ module Goodmail
     end
 
     # Lower-level wrapper for apps that must call `Goodmail.render` separately
-    # (Devise, Pay, whitelabel config swaps, etc.) but still want Goodmail to
-    # own the mechanical Action Mailer handoff. This stays inside the mailer
-    # method, so Action Mailer's lazy `MessageDelivery` and `deliver_later`
-    # serialization model remain intact.
+    # but still want Goodmail to own the mechanical Action Mailer handoff. This
+    # stays inside the mailer method, so Action Mailer's lazy `MessageDelivery`
+    # and `deliver_later` serialization model remain intact.
     # Source:
     # https://github.com/rails/rails/blob/097017cd861e4fc57fb7b2612a409538ff2677fc/actionmailer/lib/action_mailer/message_delivery.rb#L142-L155
     def goodmail_mail_parts(parts, mail_headers = {}, unsubscribe_url: DEFAULT_UNSUBSCRIBE_URL, **headers)

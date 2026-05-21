@@ -40,6 +40,8 @@
 # - Subscription webhooks: https://github.com/pay-rails/pay/tree/main/lib/pay/stripe/webhooks
 # - Pay::Charge model: https://github.com/pay-rails/pay/blob/main/app/models/pay/charge.rb
 # - Pay configuration: https://github.com/pay-rails/pay/blob/main/docs/2_configuration.md
+# - Goodmail Action Mailer helper:
+#   https://github.com/rameerez/goodmail/blob/638245a4c600abd57c1a55c7c719825a3390c8f3/lib/goodmail/action_mailer_integration.rb#L111-L140
 #
 class PayGoodmailer < Pay.parent_mailer.constantize
   include Rails.application.routes.url_helpers
@@ -313,7 +315,7 @@ class PayGoodmailer < Pay.parent_mailer.constantize
 
       space
 
-      if pay_subscription.active?
+      if subscription_continuing_after_trial?(pay_subscription)
         text t('pay.mailer.subscription_trial_ended.continue_message',
           default: 'Thanks for sticking with us! Your subscription is now active and billing normally.'
         )
@@ -396,10 +398,10 @@ class PayGoodmailer < Pay.parent_mailer.constantize
   # This method:
   # - Gets mail arguments from Pay's configuration
   # - Sets up i18n subject and preheader
-  # - Renders email content using Goodmail
-  # - Adds List-Unsubscribe header if configured
+  # - Lets Goodmail render the DSL and call Action Mailer's `mail`
+  # - Adds List-Unsubscribe / RFC 8058 one-click headers if configured
   # - Attaches receipts for receipt emails
-  # - Sends the email via ActionMailer
+  # - Sends the email via Action Mailer
   def send_pay_goodmail(action_sym, &dsl_block)
     # Ensure pay_customer is set in params (get from subscription if needed)
     # This is necessary because Pay.mail_arguments expects params[:pay_customer] to exist
@@ -420,29 +422,51 @@ class PayGoodmailer < Pay.parent_mailer.constantize
     # Update subject in mail arguments
     pay_mail_arguments[:subject] = custom_subject
 
-    # Prepare Goodmail render options
-    goodmail_options = {
-      subject: custom_subject,
-      preheader: t(
-        "pay.mailer.#{action_sym}.preheader",
-        application_name: app_name,
-        default: custom_subject
-      )
-    }
+    preheader = t(
+      "pay.mailer.#{action_sym}.preheader",
+      application_name: app_name,
+      default: custom_subject
+    )
 
-    # Add unsubscribe URL if configured
-    if Goodmail.config.unsubscribe_url.present?
-      goodmail_options[:unsubscribe_url] = Goodmail.config.unsubscribe_url
-    end
-
-    parts = goodmail_render_parts(goodmail_options, &dsl_block)
-
-    # Attach receipt PDF if this is a receipt email and one exists
+    # Pay's optional receipt helper exposes `receipt` plus
+    # `receipt_filename` / `filename`; attach only when that helper is
+    # actually mixed into the charge object.
+    # Source: https://github.com/pay-rails/pay/blob/v11.4.3/lib/pay/receipts.rb#L3-L8
     if action_sym == :receipt && params[:pay_charge]&.respond_to?(:receipt)
-      attachments[params[:pay_charge].filename] = params[:pay_charge].receipt
+      filename =
+        if params[:pay_charge].respond_to?(:receipt_filename)
+          params[:pay_charge].receipt_filename
+        else
+          params[:pay_charge].filename
+        end
+
+      attachments[filename] = params[:pay_charge].receipt
     end
 
-    goodmail_mail_parts(parts, pay_mail_arguments, unsubscribe_url: goodmail_options[:unsubscribe_url])
+    # Preserve Pay.mail_arguments as the envelope/header source of truth, just
+    # as Pay::UserMailer does, and let Goodmail own the Goodmail-specific
+    # render keys, multipart body, attachments, and unsubscribe headers.
+    #
+    # Sources:
+    # - Pay::UserMailer calls `mail mail_arguments`:
+    #   https://github.com/pay-rails/pay/blob/v11.4.3/app/mailers/pay/user_mailer.rb#L2-L38
+    # - Pay.mail_arguments default:
+    #   https://github.com/pay-rails/pay/blob/v11.4.3/lib/pay.rb#L93-L101
+    # - Goodmail strips render keys before calling Action Mailer:
+    #   https://github.com/rameerez/goodmail/blob/638245a4c600abd57c1a55c7c719825a3390c8f3/lib/goodmail/action_mailer_integration.rb#L53-L64
+    goodmail_mail(pay_mail_arguments, preheader: preheader, &dsl_block)
+  end
+
+  # Avoid depending on Pay's instance predicate here; older Pay versions have
+  # had status predicate differences across loaded model code. The email only
+  # needs to choose active-vs-inactive copy, so persisted status fields are the
+  # stable source of truth.
+  # Source: https://github.com/pay-rails/pay/blob/v11.4.3/app/models/pay/subscription.rb#L97-L102
+  def subscription_continuing_after_trial?(pay_subscription)
+    return false unless %w[active trialing].include?(pay_subscription.status.to_s)
+    return true unless pay_subscription.respond_to?(:ends_at) && pay_subscription.ends_at.present?
+
+    pay_subscription.ends_at.future?
   end
 
   # Get customer display name with fallback to email
