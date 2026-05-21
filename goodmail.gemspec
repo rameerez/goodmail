@@ -9,7 +9,9 @@ Gem::Specification.new do |spec|
   spec.email = ["rubygems@rameerez.com"]
 
   spec.summary = "Make your transactional emails look beautiful"
-  spec.description = "Send beautiful, simple transactional emails with zero HTML hell. Goodmail is a minimal, opinionated, expressive Ruby DSL for sending production-grade transactional emails in Rails apps that look good in any email client out of the box."
+  spec.description = "Send beautiful, simple transactional emails with zero HTML hell. Goodmail is a minimal, " \
+                     "opinionated, expressive Ruby DSL for sending production-grade transactional emails in " \
+                     "Rails apps that look good in any email client out of the box."
 
   spec.homepage = "https://github.com/rameerez/goodmail"
   spec.license = "MIT"
@@ -35,12 +37,17 @@ Gem::Specification.new do |spec|
   spec.require_paths = ["lib"]
 
   # Uncomment to register a new dependency of your gem
+  spec.add_dependency "premailer-rails", ">= 1.10"
   spec.add_dependency "rails", ">= 7.0"
   spec.add_dependency "rails-html-sanitizer", ">= 1.0"
-  spec.add_dependency "premailer-rails", ">= 1.10"
+  # Ruby warns that `ostruct` leaves the default gems set in Ruby 3.5.
+  # Goodmail requires it directly in `lib/goodmail.rb`, so declare the
+  # runtime dependency now instead of relying on the interpreter bundle.
+  # Source: https://bugs.ruby-lang.org/journals/107033/diff?detail_id=66531
+  spec.add_dependency "ostruct", ">= 0.6"
 
-  # For more information and examples about making a new gem, check out our
-  # guide at: https://bundler.io/guides/creating_gem.html
-  spec.add_development_dependency "pry"
-  spec.add_development_dependency "rake", "~> 13.0"
+  # Development dependencies live in the `Gemfile`'s `:development` /
+  # `:test` groups, matching the convention shared with the sibling
+  # gems. The gemspec stays
+  # focused on what downstream gems install at runtime.
 end

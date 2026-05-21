@@ -32,7 +32,7 @@ module Goodmail
         body_html:       body_html,
         subject:         subject || "",
         config:          Goodmail.config, # Make config available
-        unsubscribe_url: unsubscribe_url,  # Pass unsubscribe URL to template
+        unsubscribe_url: unsubscribe_url, # Pass unsubscribe URL to template
         preheader:       preheader # Pass preheader to template
       )
     rescue => e

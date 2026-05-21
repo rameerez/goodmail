@@ -1,60 +1,59 @@
 # frozen_string_literal: true
 require "action_mailer"
-require "cgi" # For unescaping HTML in plaintext generation
-require_relative "mailer" # Require the internal mailer
+require_relative "mailer"
 
 module Goodmail
-  # Responsible for orchestrating the building of the Mail::Message object.
+  # Responsible for orchestrating the building of the Action Mailer delivery.
   module Dispatcher
     extend self
 
-    # Builds the Mail::Message object with HTML and Text parts, wrapped in
-    # an ActionMailer::MessageDelivery object.
+    # Builds an ActionMailer::MessageDelivery with HTML and text parts.
     # @api private
     def build_message(headers, &block)
-      # 1. Initialize the Builder
-      builder = Goodmail::Builder.new
+      headers = headers.dup
+      render_config_overrides = render_config(headers)
 
-      # 2. Execute the DSL block within the Builder instance
-      builder.instance_eval(&block) if block_given?
+      Goodmail.with_config(render_config_overrides) do
+        parts = Goodmail.render(headers, &block)
 
-      # 3. Determine the final unsubscribe URL (user-provided)
-      unsubscribe_url = headers[:unsubscribe_url] || Goodmail.config.unsubscribe_url
-
-      # 4. Determine preheader text (priority: header > config > subject)
-      preheader = headers[:preheader] || Goodmail.config.default_preheader || headers[:subject]
-
-      # 5. Render the raw HTML body using the Layout
-      raw_html_body = Goodmail::Layout.render(
-        builder.html_output,
-        headers[:subject],
-        unsubscribe_url: unsubscribe_url,
-        preheader: preheader # Pass preheader to layout
-      )
-
-      # 6. Slice standard headers for the mailer action
-      mailer_headers = slice_mail_headers(headers)
-
-      # 7. Build the mail object via the internal Mailer class action.
-      delivery_object = Goodmail::Mailer.compose_message(
-        mailer_headers,
-        raw_html_body,
-        nil, # Pass nil for raw_text_body - Premailer generates it
-        unsubscribe_url
-      )
-
-      # 8. Return the ActionMailer::MessageDelivery object
-      delivery_object
+        # ActionMailer::MessageDelivery processes this mailer action lazily and
+        # `deliver_later` serializes only action arguments, so pass already
+        # rendered strings and plain attachment descriptor hashes into the action.
+        # Sources:
+        # - MessageDelivery laziness:
+        #   https://github.com/rails/rails/blob/debbd18c562df17d01944c475e9291d927910b58/actionmailer/lib/action_mailer/message_delivery.rb#L22-L35
+        # - deliver_later serializes mailer action arguments:
+        #   https://github.com/rails/rails/blob/debbd18c562df17d01944c475e9291d927910b58/actionmailer/lib/action_mailer/message_delivery.rb#L142-L155
+        Goodmail::Mailer.compose_message(
+          slice_mail_headers(headers),
+          parts.html,
+          parts.text,
+          resolved_unsubscribe_url(headers),
+          parts.attachments
+        )
+      end
     end
 
     private
 
-    # Whitelist standard headers to pass to ActionMailer's mail() method
-    # Excludes custom headers like :unsubscribe_url, :preheader
+    # Pass Action Mailer's normal header surface through, excluding only
+    # Goodmail render-only options such as :unsubscribe_url and :preheader.
     def slice_mail_headers(h)
-      h.slice(:to, :from, :cc, :bcc, :reply_to, :subject)
+      Goodmail.action_mailer_headers(h)
     end
 
-    # Removed generate_plaintext - now handled by Premailer in Mailer#compose_message
+    def render_config(headers)
+      render_option(headers, :config) || render_option(headers, :configuration)
+    end
+
+    def resolved_unsubscribe_url(headers)
+      render_option(headers, :unsubscribe_url) || Goodmail.config.unsubscribe_url
+    end
+
+    def render_option(headers, key)
+      return headers[key] if headers.key?(key)
+
+      headers[key.to_s] if headers.key?(key.to_s)
+    end
   end
 end

@@ -12,7 +12,6 @@
 # - Automatic List-Unsubscribe header handling
 # - Receipt PDF attachment support
 # - Extra billing info support
-# - Customer name personalization
 # - URL helper integration
 #
 # SETUP INSTRUCTIONS:
@@ -49,11 +48,8 @@ class PayGoodmailer < Pay.parent_mailer.constantize
   # Triggered by: charge.succeeded webhook
   # Params: params[:pay_customer], params[:pay_charge]
   def receipt
-    pay_customer = params[:pay_customer]
     pay_charge = params[:pay_charge]
 
-    # Get recipient details
-    recipient_name = customer_display_name(pay_customer)
     formatted_date = localize_date(pay_charge.created_at)
 
     # Capture URLs before the block
@@ -61,7 +57,7 @@ class PayGoodmailer < Pay.parent_mailer.constantize
 
     send_pay_goodmail(:receipt) do
       # Add a friendly GIF (customize the URL to your own!)
-      image("https://assets.rameerez.com/mailers/ok.gif", "Payment confirmed!", width: 250)
+      image("https://example.com/mailers/ok.gif", "Payment confirmed!", width: 250)
 
       h1 t('pay.mailer.receipt.title', default: 'Payment Received!')
 
@@ -105,15 +101,13 @@ class PayGoodmailer < Pay.parent_mailer.constantize
   # Triggered by: charge.refunded webhook
   # Params: params[:pay_customer], params[:pay_charge]
   def refund
-    pay_customer = params[:pay_customer]
     pay_charge = params[:pay_charge]
 
-    recipient_name = customer_display_name(pay_customer)
     formatted_date = localize_date(pay_charge.created_at)
 
     send_pay_goodmail(:refund) do
       # Add a friendly GIF (customize the URL to your own!)
-      image("https://assets.rameerez.com/mailers/ok.gif", "Refund confirmed!", width: 250)
+      image("https://example.com/mailers/ok.gif", "Refund confirmed!", width: 250)
 
       h1 t('pay.mailer.refund.title', default: 'Refund Processed')
 
@@ -151,10 +145,8 @@ class PayGoodmailer < Pay.parent_mailer.constantize
   # Params: params[:pay_customer], params[:pay_subscription], params[:date]
   def subscription_renewing
     pay_subscription = params[:pay_subscription]
-    pay_customer = params[:pay_customer] || pay_subscription.customer
     renewal_date = params[:date]
 
-    recipient_name = customer_display_name(pay_customer)
     formatted_renewal_date = renewal_date ? localize_date(renewal_date) : nil
     days_until_renewal = renewal_date ? (renewal_date.to_date - Date.current).to_i : nil
 
@@ -199,13 +191,9 @@ class PayGoodmailer < Pay.parent_mailer.constantize
   # (e.g., 3D Secure authentication, expired card)
   #
   # Triggered by: invoice.payment_action_required webhook
-  # Params: params[:pay_customer], params[:pay_subscription], params[:payment_intent_id]
+  # Params: params[:pay_customer], params[:pay_subscription]
   def payment_action_required
     pay_subscription = params[:pay_subscription]
-    pay_customer = params[:pay_customer] || pay_subscription.customer
-    payment_intent_id = params[:payment_intent_id]
-
-    recipient_name = customer_display_name(pay_customer)
 
     # Capture URLs before the block
     billing_link = billing_url
@@ -242,9 +230,7 @@ class PayGoodmailer < Pay.parent_mailer.constantize
   # Params: params[:pay_customer], params[:pay_subscription]
   def subscription_trial_will_end
     pay_subscription = params[:pay_subscription]
-    pay_customer = params[:pay_customer] || pay_subscription.customer
 
-    recipient_name = customer_display_name(pay_customer)
     formatted_trial_end = pay_subscription.trial_ends_at ? localize_date(pay_subscription.trial_ends_at) : nil
     days_remaining = pay_subscription.trial_ends_at ? (pay_subscription.trial_ends_at.to_date - Date.current).to_i : nil
 
@@ -290,9 +276,6 @@ class PayGoodmailer < Pay.parent_mailer.constantize
   # Params: params[:pay_customer], params[:pay_subscription]
   def subscription_trial_ended
     pay_subscription = params[:pay_subscription]
-    pay_customer = params[:pay_customer] || pay_subscription.customer
-
-    recipient_name = customer_display_name(pay_customer)
 
     # Capture URLs before the block
     billing_link = billing_url
@@ -313,7 +296,7 @@ class PayGoodmailer < Pay.parent_mailer.constantize
 
       space
 
-      if pay_subscription.active?
+      if subscription_continuing_after_trial?(pay_subscription)
         text t('pay.mailer.subscription_trial_ended.continue_message',
           default: 'Thanks for sticking with us! Your subscription is now active and billing normally.'
         )
@@ -343,16 +326,13 @@ class PayGoodmailer < Pay.parent_mailer.constantize
   # Params: params[:pay_customer], params[:pay_subscription]
   def payment_failed
     pay_subscription = params[:pay_subscription]
-    pay_customer = params[:pay_customer] || pay_subscription.customer
-
-    recipient_name = customer_display_name(pay_customer)
 
     # Capture URLs before the block
     billing_link = billing_url
 
     send_pay_goodmail(:payment_failed) do
       # Add a friendly "uh-oh" GIF (customize the URL to your own!)
-      image("https://assets.rameerez.com/mailers/uh-oh.gif", "Uh-oh!", width: 150)
+      image("https://example.com/mailers/uh-oh.gif", "Uh-oh!", width: 150)
 
       h1 t('pay.mailer.payment_failed.title', default: 'Uh-oh! Payment Issue')
 
@@ -396,10 +376,10 @@ class PayGoodmailer < Pay.parent_mailer.constantize
   # This method:
   # - Gets mail arguments from Pay's configuration
   # - Sets up i18n subject and preheader
-  # - Renders email content using Goodmail
-  # - Adds List-Unsubscribe header if configured
+  # - Lets Goodmail render the DSL and call Action Mailer's `mail`
+  # - Adds List-Unsubscribe / RFC 8058 one-click headers if configured
   # - Attaches receipts for receipt emails
-  # - Sends the email via ActionMailer
+  # - Sends the email via Action Mailer
   def send_pay_goodmail(action_sym, &dsl_block)
     # Ensure pay_customer is set in params (get from subscription if needed)
     # This is necessary because Pay.mail_arguments expects params[:pay_customer] to exist
@@ -420,48 +400,49 @@ class PayGoodmailer < Pay.parent_mailer.constantize
     # Update subject in mail arguments
     pay_mail_arguments[:subject] = custom_subject
 
-    # Prepare Goodmail render options
-    goodmail_options = {
-      subject: custom_subject,
-      preheader: t(
-        "pay.mailer.#{action_sym}.preheader",
-        application_name: app_name,
-        default: custom_subject
-      )
-    }
+    preheader = t(
+      "pay.mailer.#{action_sym}.preheader",
+      application_name: app_name,
+      default: custom_subject
+    )
 
-    # Add unsubscribe URL if configured
-    if Goodmail.config.unsubscribe_url.present?
-      goodmail_options[:unsubscribe_url] = Goodmail.config.unsubscribe_url
-    end
-
-    # Render email using Goodmail
-    parts = Goodmail.render(goodmail_options, &dsl_block)
-
-    # Add List-Unsubscribe header if unsubscribe URL is present
-    if goodmail_options[:unsubscribe_url].present?
-      pay_mail_arguments["List-Unsubscribe"] = "<#{goodmail_options[:unsubscribe_url]}>"
-    end
-
-    # Attach receipt PDF if this is a receipt email and one exists
+    # Pay's optional receipt helper exposes `receipt` plus
+    # `receipt_filename` / `filename`; attach only when that helper is
+    # actually mixed into the charge object.
+    # Source: https://github.com/pay-rails/pay/blob/v11.4.3/lib/pay/receipts.rb#L3-L8
     if action_sym == :receipt && params[:pay_charge]&.respond_to?(:receipt)
-      attachments[params[:pay_charge].filename] = params[:pay_charge].receipt
+      filename =
+        if params[:pay_charge].respond_to?(:receipt_filename)
+          params[:pay_charge].receipt_filename
+        else
+          params[:pay_charge].filename
+        end
+
+      attachments[filename] = params[:pay_charge].receipt
     end
 
-    # Send the email
-    mail(pay_mail_arguments) do |format|
-      format.text { render plain: parts.text }
-      format.html { render html: parts.html.html_safe }
-    end
+    # Preserve Pay.mail_arguments as the envelope/header source of truth, just
+    # as Pay::UserMailer does, and let Goodmail own the Goodmail-specific
+    # render keys, multipart body, attachments, and unsubscribe headers.
+    #
+    # Sources:
+    # - Pay::UserMailer calls `mail mail_arguments`:
+    #   https://github.com/pay-rails/pay/blob/v11.4.3/app/mailers/pay/user_mailer.rb#L2-L38
+    # - Pay.mail_arguments default:
+    #   https://github.com/pay-rails/pay/blob/v11.4.3/lib/pay.rb#L93-L101
+    goodmail_mail(pay_mail_arguments, preheader: preheader, &dsl_block)
   end
 
-  # Get customer display name with fallback to email
-  def customer_display_name(pay_customer)
-    if pay_customer.respond_to?(:customer_name) && pay_customer.customer_name.present?
-      pay_customer.customer_name
-    else
-      pay_customer.owner.email
-    end
+  # Avoid depending on Pay's instance predicate here; older Pay versions have
+  # had status predicate differences across loaded model code. The email only
+  # needs to choose active-vs-inactive copy, so persisted status fields are the
+  # stable source of truth.
+  # Source: https://github.com/pay-rails/pay/blob/v11.4.3/app/models/pay/subscription.rb#L97-L102
+  def subscription_continuing_after_trial?(pay_subscription)
+    return false unless %w[active trialing].include?(pay_subscription.status.to_s)
+    return true unless pay_subscription.respond_to?(:ends_at) && pay_subscription.ends_at.present?
+
+    pay_subscription.ends_at.future?
   end
 
   # Localize date using i18n
