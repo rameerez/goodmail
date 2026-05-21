@@ -56,7 +56,7 @@ The plaintext part of every multipart message had four classes of artifact that 
 - `ostruct` declared as an explicit runtime dependency. Goodmail requires it directly (configuration is backed by `OpenStruct`); Ruby 3.4 prints a deprecation warning when ostruct is loaded from the standard library, and Ruby 3.5 removes it from the default gems set entirely.
 
 ### Meta
-- Standardized the testing scaffolding to match the convention shared with the sibling gems (`pricing_plans`, `profitable`, `usage_credits`):
+- Standardized the testing scaffolding to match the convention shared with the surrounding Ruby gems:
   - `.simplecov` config file (auto-loaded; SimpleFormatter, branch coverage enabled, minimum thresholds, custom at_exit summary).
   - `Gemfile` with `:development` / `:development, :test` groups (minitest ~> 6.0, minitest-mock, minitest-reporters, simplecov, rubocop + rubocop-minitest + rubocop-performance).
   - `Rakefile` using `bundler/gem_tasks` + `Rake::TestTask`; `rake test` runs the suite with the canonical Minitest::Reporters output and emits the coverage summary at the end.

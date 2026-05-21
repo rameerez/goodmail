@@ -57,7 +57,7 @@ class PayGoodmailer < Pay.parent_mailer.constantize
 
     send_pay_goodmail(:receipt) do
       # Add a friendly GIF (customize the URL to your own!)
-      image("https://assets.rameerez.com/mailers/ok.gif", "Payment confirmed!", width: 250)
+      image("https://example.com/mailers/ok.gif", "Payment confirmed!", width: 250)
 
       h1 t('pay.mailer.receipt.title', default: 'Payment Received!')
 
@@ -107,7 +107,7 @@ class PayGoodmailer < Pay.parent_mailer.constantize
 
     send_pay_goodmail(:refund) do
       # Add a friendly GIF (customize the URL to your own!)
-      image("https://assets.rameerez.com/mailers/ok.gif", "Refund confirmed!", width: 250)
+      image("https://example.com/mailers/ok.gif", "Refund confirmed!", width: 250)
 
       h1 t('pay.mailer.refund.title', default: 'Refund Processed')
 
@@ -332,7 +332,7 @@ class PayGoodmailer < Pay.parent_mailer.constantize
 
     send_pay_goodmail(:payment_failed) do
       # Add a friendly "uh-oh" GIF (customize the URL to your own!)
-      image("https://assets.rameerez.com/mailers/uh-oh.gif", "Uh-oh!", width: 150)
+      image("https://example.com/mailers/uh-oh.gif", "Uh-oh!", width: 150)
 
       h1 t('pay.mailer.payment_failed.title', default: 'Uh-oh! Payment Issue')
 

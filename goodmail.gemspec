@@ -48,6 +48,6 @@ Gem::Specification.new do |spec|
 
   # Development dependencies live in the `Gemfile`'s `:development` /
   # `:test` groups, matching the convention shared with the sibling
-  # gems (pricing_plans, profitable, usage_credits). The gemspec stays
+  # gems. The gemspec stays
   # focused on what downstream gems install at runtime.
 end
