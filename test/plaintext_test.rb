@@ -312,7 +312,7 @@ class PlaintextTest < Minitest::Test
     Goodmail.compose(
       to: "u@x.co", from: "n@x.co", subject: "Subj"
     ) do
-      text "Bienvenido a CarHey, donde compartimos viajes."
+      text "Bienvenido a ExampleApp, donde compartimos viajes."
       info_row "Duración", "25 min"
       info_row "Distancia", "18 km"
       info_row "Precio", "2,50 €"
