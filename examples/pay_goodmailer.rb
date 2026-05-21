@@ -435,24 +435,14 @@ class PayGoodmailer < Pay.parent_mailer.constantize
       goodmail_options[:unsubscribe_url] = Goodmail.config.unsubscribe_url
     end
 
-    # Render email using Goodmail
-    parts = Goodmail.render(goodmail_options, &dsl_block)
-
-    # Add List-Unsubscribe header if unsubscribe URL is present
-    if goodmail_options[:unsubscribe_url].present?
-      pay_mail_arguments["List-Unsubscribe"] = "<#{goodmail_options[:unsubscribe_url]}>"
-    end
+    parts = goodmail_render_parts(goodmail_options, &dsl_block)
 
     # Attach receipt PDF if this is a receipt email and one exists
     if action_sym == :receipt && params[:pay_charge]&.respond_to?(:receipt)
       attachments[params[:pay_charge].filename] = params[:pay_charge].receipt
     end
 
-    # Send the email
-    mail(pay_mail_arguments) do |format|
-      format.text { render plain: parts.text }
-      format.html { render html: parts.html.html_safe }
-    end
+    goodmail_mail_parts(parts, pay_mail_arguments, unsubscribe_url: goodmail_options[:unsubscribe_url])
   end
 
   # Get customer display name with fallback to email

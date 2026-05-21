@@ -37,7 +37,7 @@ module Goodmail
   # We pre-process the HTML to neutralize each of these BEFORE
   # plaintext extraction, then apply a small post-extraction
   # cleanup pass for the residual artifacts (logo alt line,
-  # standalone URL lines from logo links, blank-line compaction).
+  # blank-line compaction).
   #
   # Sources:
   #   - Premailer to_plain_text:
@@ -84,7 +84,6 @@ module Goodmail
       text = strip_preheader_line(text, preheader)
       text = strip_logo_alt_line(text)
       text = strip_company_name_alt_line(text)
-      text = strip_standalone_url_lines(text)
       text = compact_blank_lines(text)
       text.strip
     end
@@ -147,13 +146,13 @@ module Goodmail
         table.replace(replacement)
       end
       doc.to_html
-    rescue StandardError => error
+    rescue StandardError => e
       # If Nokogiri ever chokes (truncated HTML, malformed input from a
       # custom layout), preserve the original behavior — the table
       # cells still get emitted as two lines, which is ugly but not
       # broken. We only log so the failure is visible without crashing
       # the whole email pipeline.
-      warn "[Goodmail::Plaintext] info-row flatten failed: #{error.class}: #{error.message}"
+      warn "[Goodmail::Plaintext] info-row flatten failed: #{e.class}: #{e.message}"
       html
     end
 
@@ -225,15 +224,6 @@ module Goodmail
 
       company_name = Regexp.escape(Goodmail.config.company_name)
       text.gsub(/^\s*#{company_name}\s*$\n?/, "")
-    end
-
-    # Removes lines that consist *only* of an http(s) URL — those
-    # almost always come from an image link the layout renders that
-    # extracts as a standalone footnote-style URL in plaintext. URLs
-    # inside a sentence (`visit https://x.co for more`) are preserved
-    # because the regex requires the URL to be the entire line.
-    def strip_standalone_url_lines(text)
-      text.gsub(/^\s*https?:\/\/\S+\s*$\n?/i, "")
     end
 
     # Compacts runs of 3+ newlines down to exactly 2 (one blank line

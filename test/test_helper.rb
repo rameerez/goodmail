@@ -21,7 +21,7 @@
 # MINITEST 6 BREAKING CHANGES THE SUITE ASSUMES
 #
 #   - `Minitest::Mock` was extracted to the `minitest-mock` gem in 6.0.
-#     We add it as a dev-dep in `goodmail.gemspec` and `require` it
+#     We add it as a dev/test dependency in `Gemfile` and `require` it
 #     here so test files can use `Minitest::Mock` without ceremony.
 #     (The suite does not actually rely on mocks today, but the require
 #     is here to keep parity with future contributors who reach for it.)
@@ -35,11 +35,10 @@
 # Source: https://github.com/minitest/minitest/blob/master/History.rdoc
 $LOAD_PATH.unshift File.expand_path("../lib", __dir__)
 
-# SimpleCov MUST be loaded BEFORE any gem code is required so the
-# lines loaded during `require "goodmail"` are counted. Configuration
-# is auto-loaded from the `.simplecov` file at repo root (matches the
-# convention shared with the sibling gems).
-require "simplecov"
+# SimpleCov MUST be loaded BEFORE any gem code is required so the lines loaded
+# during `require "goodmail"` are counted. Keep it opt-in so normal local and
+# CI test runs stay fast; use `COVERAGE=1 bundle exec rake test`.
+require "simplecov" if ENV["COVERAGE"]
 
 require "minitest/autorun"
 require "minitest/mock"

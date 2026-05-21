@@ -179,12 +179,13 @@ class PlaintextTest < Minitest::Test
     assert_includes text, "Body"
   end
 
-  # ── Standalone URL line stripping ──────────────────────────────────
+  # ── Standalone URL preservation ────────────────────────────────────
 
-  def test_standalone_url_lines_get_stripped
+  def test_standalone_url_lines_are_preserved_when_visible_body_content
     html = "<body><p>before</p><p>https://example.com/standalone</p><p>after</p></body>"
     text = Goodmail::Plaintext.generate(html)
-    refute_match(/^https?:\/\/example\.com\/standalone\s*$/, text)
+
+    assert_match(%r{^https://example\.com/standalone\s*$}, text)
     assert_includes text, "before"
     assert_includes text, "after"
   end

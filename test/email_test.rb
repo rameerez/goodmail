@@ -1,6 +1,7 @@
 # frozen_string_literal: true
 
 require "test_helper"
+require "tempfile"
 
 # Tests for `Goodmail::EmailParts` (the data struct) and `Goodmail.render`
 # (the entry point that composes Builder + Layout + Premailer and returns
@@ -91,6 +92,55 @@ class EmailTest < Minitest::Test
     assert_equal "application/pdf", pdf[:mime_type]
     assert_equal false, pdf[:inline]
     assert_equal true, png[:inline]
+    assert_match(/\A[0-9a-f]{24}\.logo\.png@inline\.goodmail\.invalid\z/, png[:content_id])
+  end
+
+  def test_render_can_evaluate_the_dsl_with_a_context_and_locale
+    context = Object.new
+    context.instance_variable_set(:@recipient_name, "Avery")
+    I18n.backend.store_translations(:pt, goodmail_render_test: { copy: "Ola" })
+
+    original_available_locales = I18n.available_locales
+    I18n.available_locales = (original_available_locales + [:pt]).uniq
+    parts = Goodmail.render(subject: "Subj", context: context, locale: :pt) do
+      text "#{I18n.t("goodmail_render_test.copy")} #{@recipient_name}"
+    end
+
+    assert_includes parts.html, "Ola Avery"
+    assert_includes parts.text, "Ola Avery"
+  ensure
+    I18n.available_locales = original_available_locales if defined?(original_available_locales)
+  end
+
+  def test_render_accepts_a_per_render_config_override_without_mutating_global_config
+    GoodmailTestConfig.configure(company_name: "Global Co.", brand_color: "#111827")
+
+    parts = Goodmail.render(
+      subject: "Whitelabel",
+      config: { company_name: "Tenant Co.", brand_color: "#ff5500" }
+    ) do
+      button "Open", "https://example.com/open"
+      sign
+    end
+
+    assert_includes parts.html, "Tenant Co."
+    assert_includes parts.html, "#ff5500"
+    assert_equal "Global Co.", Goodmail.config.company_name
+    assert_equal "#111827", Goodmail.config.brand_color
+  end
+
+  def test_render_uses_custom_layout_path_when_passed_as_a_render_option
+    Tempfile.create(["goodmail-render-layout", ".erb"]) do |file|
+      file.write("<html><body>RENDER-LAYOUT <%= body_html %></body></html>")
+      file.flush
+
+      parts = Goodmail.render(subject: "Subj", layout_path: file.path) do
+        text "custom render body"
+      end
+
+      assert_includes parts.html, "RENDER-LAYOUT"
+      assert_includes parts.html, "custom render body"
+    end
   end
 
   # ── Goodmail.render — header handling ───────────────────────────────
@@ -146,17 +196,16 @@ class EmailTest < Minitest::Test
     refute_match(/Acme\s+Logo\s*\(.*example\.com.*\)/, parts.text)
   end
 
-  def test_render_strips_standalone_url_lines_from_plaintext
-    # The cleanup regex targets lines that consist *only* of a URL —
-    # those almost always come from logo links or similar artifacts that
-    # Premailer renders as a footnote-style URL on its own line. The
-    # regex is anchored to start/end of line so URLs inline with text
-    # (like a sentence "visit https://x.co for more") survive.
+  def test_render_preserves_standalone_url_lines_from_visible_body_content
+    # A bare URL can be intentional in plaintext-heavy transactional emails
+    # (for example password-reset fallbacks). The cleanup pass must not delete
+    # visible body content just because it happens to be URL-shaped.
     parts = Goodmail.render(subject: "Subj") do
-      image "https://cdn.example.com/standalone.png", "alt"
+      text "https://cdn.example.com/standalone.png"
       text "Some body text that mentions https://example.com inline."
     end
-    refute_match(/^https?:\/\/cdn\.example\.com\/standalone\.png\s*$/, parts.text)
+
+    assert_match(%r{^https://cdn\.example\.com/standalone\.png\s*$}, parts.text)
     assert_includes parts.text, "https://example.com inline"
   end
 

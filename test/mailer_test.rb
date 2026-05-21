@@ -13,9 +13,8 @@ require "test_helper"
 #   2. List-Unsubscribe + List-Unsubscribe-Post header pair (RFC 8058 /
 #      Gmail+Yahoo Feb 2024 sender requirements)
 #   3. DSL-attachment fan-out to ActionMailer's attachments hash
-#   4. Inline-image Content-ID pinning (so `cid:FILENAME` resolves)
-#   5. Plaintext cleanup (logo alt line, standalone URL lines, blank-
-#      line compaction)
+#   4. Inline-image Content-ID pinning (so generated `cid:` URLs resolve)
+#   5. Plaintext cleanup (logo alt line, blank-line compaction)
 class MailerTest < Minitest::Test
   # ── Premailer: CSS inlining + plain text part ────────────────────────
 
@@ -78,6 +77,23 @@ class MailerTest < Minitest::Test
     assert_nil msg["List-Unsubscribe-Post"]
   end
 
+  def test_one_click_post_header_is_skipped_for_non_https_unsubscribe_urls
+    # RFC 8058 one-click requires an HTTPS URI in List-Unsubscribe. We still
+    # preserve the classic header for backwards compatibility, but we do not
+    # claim POST support for http/mailto/malformed values.
+    msg = compose(unsubscribe_url: "http://example.com/u") { text "hi" }.message
+
+    assert_equal "<http://example.com/u>", msg["List-Unsubscribe"].value
+    assert_nil msg["List-Unsubscribe-Post"]
+  end
+
+  def test_one_click_post_header_is_skipped_for_malformed_unsubscribe_urls
+    msg = compose(unsubscribe_url: "https://exa mple.com/u") { text "hi" }.message
+
+    assert_equal "<https://exa mple.com/u>", msg["List-Unsubscribe"].value
+    assert_nil msg["List-Unsubscribe-Post"]
+  end
+
   def test_unsubscribe_headers_are_skipped_when_url_is_non_string
     # Defensive: a caller might accidentally pass `true` or a Hash and
     # the gem must not crash trying to interpolate it. The header check
@@ -135,21 +151,20 @@ class MailerTest < Minitest::Test
     assert_equal ["calendar.ics", "logo.png", "receipt.pdf"], filenames
   end
 
-  # ── Inline-image Content-ID pinning (the 0.4.2 fix) ─────────────────
+  # ── Inline-image Content-ID pinning ─────────────────────────────────
 
-  def test_inline_attachment_content_id_is_pinned_to_the_filename
+  def test_inline_attachment_content_id_is_pinned_to_the_generated_id
     # Mail gem auto-generates a globally-unique Content-ID
-    # (`<longhash@host.tld.mail>`) for every attachment. The DSL emits
-    # `<img src="cid:FILENAME">` in the body, so without our fix-up the
-    # body's `cid:logo.png` would dangle and the image would render as
-    # a broken icon in every email client. Goodmail pins the inline
-    # part's Content-ID to the filename so the body's reference resolves.
+    # (`<longhash@host.tld.mail>`) for every attachment. The DSL must emit
+    # the body `<img src="cid:...">` before Action Mailer materializes the
+    # attachment part, so Goodmail generates the Content-ID in Builder and
+    # pins the Mail part to that exact ID here.
     msg = compose do
       inline_image "logo.png", "PNG_BYTES"
     end.message
 
     logo = msg.attachments.find { |a| a.filename == "logo.png" }
-    assert_equal "<logo.png>", logo.content_id
+    assert_match(/\A<[0-9a-f]{24}\.logo\.png@inline\.goodmail\.invalid>\z/, logo.content_id)
   end
 
   def test_inline_attachment_body_emits_cid_reference_matching_the_pinned_id
@@ -158,7 +173,8 @@ class MailerTest < Minitest::Test
     end.message
 
     html = msg.html_part.body.decoded
-    assert_match(/<img[^>]+src="cid:hero\.png"/, html)
+    hero = msg.attachments.find { |a| a.filename == "hero.png" }
+    assert_match(/<img[^>]+src="cid:#{Regexp.escape(hero.content_id.delete_prefix("<").delete_suffix(">"))}"/, html)
   end
 
   def test_non_inline_attachments_keep_their_default_content_id
@@ -174,7 +190,7 @@ class MailerTest < Minitest::Test
   end
 
   def test_attach_does_NOT_crash_on_binary_content_with_NUL_bytes
-    # Regression guard for the 0.4.2 fix in `resolve_attachment_content`.
+    # Regression guard for the binary-content fix in `resolve_attachment_content`.
     # `File.file?` raises ArgumentError on NUL-containing Strings; PNGs,
     # PDFs, and .ics-as-bytes routinely contain them.
     binary = "\x89PNG\r\n\x1A\n\x00\x00\x00\rIHDR".b
@@ -198,7 +214,15 @@ class MailerTest < Minitest::Test
     refute_match(/Acme\s+Logo\s*\(.*example\.com.*\)/, text)
   end
 
-  def test_plaintext_strips_standalone_URL_lines
+  def test_plaintext_preserves_visible_standalone_url_lines
+    text = compose do
+      text "https://example.com/reset"
+    end.message.text_part.body.decoded
+
+    assert_includes text, "https://example.com/reset"
+  end
+
+  def test_plaintext_from_images_does_not_emit_raw_image_src_lines
     text = compose do
       image "https://cdn.example.com/standalone.png", "alt"
       text "Some body text."

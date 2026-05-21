@@ -1,11 +1,12 @@
 # frozen_string_literal: true
 
-# SimpleCov configuration file (auto-loaded before test suite)
-# This keeps test_helper.rb clean and follows best practices
+# SimpleCov configuration file, loaded by test/test_helper.rb when
+# COVERAGE=1 is set. Normal test runs skip coverage instrumentation.
 
 SimpleCov.start do
   # Use SimpleFormatter for terminal-only output (no HTML generation)
   formatter SimpleCov::Formatter::SimpleFormatter
+  use_merging false
 
   # Track coverage for the lib directory (gem source code)
   add_filter "/test/"
@@ -24,9 +25,9 @@ SimpleCov.start do
   enable_coverage :branch
 
   # Set minimum coverage threshold to prevent coverage regression.
-  # Goodmail currently sits at 100% line / 100% branch — the floor is
-  # set generously to allow for non-trivial future additions without
-  # immediately tripping CI.
+  # Goodmail currently sits at 100% line coverage; the branch floor is set
+  # generously to allow non-trivial future additions without immediately
+  # tripping CI.
   minimum_coverage line: 90, branch: 80
 
   # Disambiguate parallel test runs
@@ -36,7 +37,15 @@ end
 # Print coverage summary to terminal after tests complete
 SimpleCov.at_exit do
   SimpleCov.result.format!
-  puts "\n" + "=" * 60
+  if ENV["COVERAGE_DETAIL"]
+    SimpleCov.result.files.each do |file|
+      missed_lines = file.missed_lines.map(&:line_number)
+      next if missed_lines.empty?
+
+      puts "#{file.filename}:#{missed_lines.join(',')}"
+    end
+  end
+  puts "\n#{'=' * 60}"
   puts "COVERAGE SUMMARY"
   puts "=" * 60
   puts "Line Coverage:   #{SimpleCov.result.covered_percent.round(2)}%"

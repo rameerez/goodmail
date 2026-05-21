@@ -86,6 +86,16 @@ class DispatcherTest < Minitest::Test
     assert_equal "<https://example.com/global-u>", msg["List-Unsubscribe"].value
   end
 
+  def test_build_message_keeps_classic_unsubscribe_but_skips_one_click_for_http_url
+    msg = Goodmail::Dispatcher.build_message(
+      to: "u@x.co", from: "n@x.co", subject: "S",
+      unsubscribe_url: "http://example.com/u"
+    ) { text "hi" }.message
+
+    assert_equal "<http://example.com/u>", msg["List-Unsubscribe"].value
+    assert_nil msg["List-Unsubscribe-Post"]
+  end
+
   def test_build_message_skips_unsubscribe_headers_when_no_url_anywhere
     msg = Goodmail::Dispatcher.build_message(
       to: "u@x.co", from: "n@x.co", subject: "S"
@@ -147,7 +157,7 @@ class DispatcherTest < Minitest::Test
     logo = msg.attachments.find { |a| a.filename == "logo.png" }
     refute_nil logo
     assert logo.inline?
-    assert_equal "<logo.png>", logo.content_id
+    assert_match(/\A<[0-9a-f]{24}\.logo\.png@inline\.goodmail\.invalid>\z/, logo.content_id)
   end
 
   def test_build_message_calls_the_block_in_Builder_context
@@ -187,20 +197,22 @@ class DispatcherTest < Minitest::Test
   # via `private` — we use `send` because covering the slicing in
   # isolation makes regressions immediately localizable). ─────────────
 
-  def test_slice_mail_headers_keeps_only_the_standard_envelope_keys
-    # Allowed: to, from, cc, bcc, reply_to, subject. Everything else
-    # (Goodmail-specific: unsubscribe_url, preheader, layout_path; and
-    # arbitrary unknown keys) should be filtered out — they'd otherwise
-    # become Mail headers via ActionMailer's catch-all behavior.
+  def test_slice_mail_headers_keeps_ActionMailer_headers_and_strips_only_Goodmail_render_keys
+    # Rails' `mail` API accepts the common envelope fields AND arbitrary
+    # message headers. Goodmail should only remove its own render-only
+    # options, then let Action Mailer do the normal header assignment.
     sliced = Goodmail::Dispatcher.send(:slice_mail_headers, {
       to: "a", from: "b", cc: "c", bcc: "d", reply_to: "e", subject: "S",
+      date: Time.utc(2026, 5, 21), "X-Custom" => "kept",
       unsubscribe_url: "u", preheader: "p", layout_path: "/dev/null", random: 1
     })
-    assert_equal %i[to from cc bcc reply_to subject].sort, sliced.keys.sort
+    assert_equal "a", sliced[:to]
+    assert_equal "kept", sliced["X-Custom"]
+    assert_equal 1, sliced[:random]
+    assert_equal Time.utc(2026, 5, 21), sliced[:date]
     refute sliced.key?(:unsubscribe_url)
     refute sliced.key?(:preheader)
     refute sliced.key?(:layout_path)
-    refute sliced.key?(:random)
   end
 
   def test_slice_mail_headers_returns_an_empty_hash_when_nothing_matches

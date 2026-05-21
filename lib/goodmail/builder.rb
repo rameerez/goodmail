@@ -1,6 +1,7 @@
 # frozen_string_literal: true
 require "erb"
 require "rails-html-sanitizer" # Require the sanitizer
+require "securerandom"
 
 module Goodmail
   # Builds the HTML content string based on DSL method calls.
@@ -8,7 +9,6 @@ module Goodmail
     include ERB::Util # For the h() helper
     # The h helper, included from ERB::Util, stands for html_escape.
     # It converts special characters (&, <, >, ", ') into their HTML entity equivalents (&amp;, &lt;, &gt;, &quot;, &#39;). This prevents Cross-Site Scripting (XSS) by ensuring dynamic content is displayed as literal text rather than being interpreted as HTML.
-
 
     # Initialize a basic sanitizer allowing inline emphasis (<a>, <strong>,
     # <em>, <b>, <i>) — the formatting tags every email client renders
@@ -29,10 +29,21 @@ module Goodmail
     HTML_SANITIZER = Rails::Html::SafeListSanitizer.new
     ALLOWED_TAGS = %w(a strong em b i).freeze
     ALLOWED_ATTRIBUTES = %w(href).freeze
+    # RFC 2606 / RFC 6761 reserve `.invalid` for names that should not collide
+    # with real DNS. Goodmail only needs a stable addr-spec domain for generated
+    # Content-IDs; it should never imply a routable host.
+    # Sources:
+    #   - https://www.rfc-editor.org/rfc/rfc2606#section-2
+    #   - https://www.rfc-editor.org/rfc/rfc6761#section-6.4
+    INLINE_CONTENT_ID_DOMAIN = "inline.goodmail.invalid"
 
     attr_reader :parts, :attachments
 
-    def initialize
+    INTERNAL_INSTANCE_VARIABLES = %i[@parts @attachments @goodmail_context].freeze
+
+    def initialize(context: nil)
+      copy_context_instance_variables(context)
+      @goodmail_context = context
       @parts = []
       # Email-level attachments collected via the `attach` DSL method. Stored as
       # `[{ filename:, content:, mime_type: }, ...]` and consumed by the
@@ -133,8 +144,9 @@ module Goodmail
     #     collapse` neutralizes the historical browser defaults and
     #     gives us pixel control via the inline `padding`.
     #   - `role="presentation"` tells screen readers to skip the table
-    #     semantics — this is layout, not data. Source: WCAG / W3C
-    #     ARIA 1.2 §6.6 (`presentation` role).
+    #     semantics — this is layout, not data. Source: WAI-ARIA 1.2
+    #     `presentation` / `none` role:
+    #     https://www.w3.org/TR/wai-aria-1.2/#presentation
     #
     # Why two SEPARATE tables per call (vs. one table with many rows):
     #   - The block-level DSL emits each call as a self-contained unit,
@@ -224,7 +236,7 @@ module Goodmail
     #
     # Sources:
     #   - ActionMailer attachments docs:
-    #     https://guides.rubyonrails.org/action_mailer_basics.html#sending-email-with-attachments
+    #     https://guides.rubyonrails.org/action_mailer_basics.html#sending-emails-with-attachments
     #   - RFC 2392 (Content-ID URLs for inline images):
     #     https://www.rfc-editor.org/rfc/rfc2392
     #
@@ -236,39 +248,48 @@ module Goodmail
     #   mime_type — optional Content-Type override. When omitted, Action Mailer
     #               infers it from the filename via Mime::Type.lookup_by_extension.
     #   inline    — when true, the attachment is marked as `inline` so the
-    #               email body can reference it via `<img src="cid:FILENAME">`.
-    #               Useful for embedding logos / maps when you can't (or don't
-    #               want to) host them publicly. See `inline_image` below for
-    #               the matching DSL helper that also emits the <img> tag.
+    #               email body can reference it via `cid:`. Useful for
+    #               embedding logos / maps when you can't (or don't want to)
+    #               host them publicly. Prefer `inline_image` below when you
+    #               also want Goodmail to emit the matching <img> tag.
     def attach(filename, content, mime_type: nil, inline: false)
       filename = filename.to_s
 
-      # Inline attachments are referenced from the email body via
-      # `cid:FILENAME`, which Mail gem resolves to the FIRST part with
-      # that Content-ID. Two `inline_image` calls with the same
-      # filename therefore produce a broken second image (no Content-ID
-      # gets pinned to it, and even if both had matching CIDs only the
-      # first would resolve in any email client).
+      # Inline attachments are referenced from the email body via `cid:`.
+      # Duplicate filenames are ambiguous in custom `Goodmail.render`
+      # fan-out code because Action Mailer's attachment hash is keyed by
+      # filename, so keep the documented "one inline filename per message"
+      # contract even though Goodmail generates distinct Content-IDs.
+      # Source: https://guides.rubyonrails.org/action_mailer_basics.html#sending-emails-with-attachments
       #
       # Non-inline attachments don't have the same problem — they're
       # downloaded by the recipient by filename, so a duplicate
       # produces two files with the same name (annoying UX but not a
       # rendering bug). We allow those.
       if inline && attachments.any? { |a| a[:inline] && a[:filename] == filename }
-        raise Goodmail::Error, "duplicate inline filename #{filename.inspect} — `cid:#{filename}` cannot resolve to two parts. Use a distinct filename per inline_image call."
+        raise Goodmail::Error, "duplicate inline filename #{filename.inspect}. Use a distinct filename per inline_image call."
       end
 
-      attachments << {
+      descriptor = {
         filename: filename,
         content: resolve_attachment_content(content),
         mime_type: mime_type,
-        inline: inline
+        inline: inline,
+        content_id: (generate_inline_content_id(filename) if inline)
       }
+      attachments << descriptor
+      descriptor
     end
 
     # Embeds an inline image and emits the matching <img> tag at this point in
-    # the email body, referencing the attachment via `cid:`. The CID is the
-    # filename, which Action Mailer maps when it serializes inline parts.
+    # the email body, referencing the attachment via `cid:`. Goodmail assigns
+    # a globally unique RFC 2392-shaped Content-ID and pins the Mail part to
+    # that same ID when the message is materialized.
+    # Sources:
+    #   - RFC 2392 `cid:` URL / Content-ID mapping:
+    #     https://www.rfc-editor.org/rfc/rfc2392
+    #   - Rails inline attachment pattern:
+    #     https://guides.rubyonrails.org/action_mailer_basics.html#making-inline-attachments
     #
     # `inline_image` is the right tool when:
     #   - the image must travel WITH the email so it renders in offline /
@@ -281,8 +302,8 @@ module Goodmail
     # `image(src, alt)` helper — it's lighter on the wire and avoids attaching
     # binary parts to every send.
     def inline_image(filename, content, alt: "", width: nil, height: nil, mime_type: nil)
-      attach(filename, content, mime_type: mime_type, inline: true)
-      image("cid:#{filename}", alt, width: width, height: height)
+      attachment = attach(filename, content, mime_type: mime_type, inline: true)
+      image("cid:#{attachment[:content_id]}", alt, width: width, height: height)
     end
 
     # The `case` only ever sees the three keys we iterate over below, so
@@ -354,6 +375,21 @@ module Goodmail
       File.binread(content)
     end
 
+    # RFC 2392 maps `cid:` URLs to Content-ID headers using an addr-spec and
+    # says Content-IDs should be globally unique. Use a random local part plus
+    # a reserved `.invalid` domain rather than the filename itself; filenames
+    # can contain spaces/non-URL characters and are often reused across emails.
+    # Sources:
+    #   - https://www.rfc-editor.org/rfc/rfc2392
+    #   - https://www.rfc-editor.org/rfc/rfc6761#section-6.4
+    def generate_inline_content_id(filename)
+      safe_filename = filename.gsub(/[^A-Za-z0-9._+-]/, "-")
+      safe_filename = "attachment" if safe_filename.empty?
+      safe_filename = safe_filename[0, 64]
+
+      "#{SecureRandom.hex(12)}.#{safe_filename}@#{INLINE_CONTENT_ID_DOMAIN}"
+    end
+
     # Helper for creating simple HTML tags with optional style
     # Assumes content is already appropriately escaped or marked safe.
     def tag(name, content, style: nil)
@@ -376,5 +412,44 @@ module Goodmail
 
     # Prevent external modification of the parts array directly
     attr_writer :parts
+
+    def copy_context_instance_variables(context)
+      return unless context
+
+      # Goodmail evaluates DSL blocks with `instance_eval` so calls like
+      # `text "..."` remain terse. That changes `self` from the mailer to the
+      # builder, which would normally hide mailer ivars such as `@user`.
+      # Snapshot public mailer state onto the transient builder so Action
+      # Mailer users can write the same instance-variable style Rails
+      # documents for mailer views/actions while Goodmail still owns the DSL
+      # receiver.
+      # Sources:
+      #   - Action Mailer actions assign instance variables for templates:
+      #     https://github.com/rails/rails/blob/097017cd861e4fc57fb7b2612a409538ff2677fc/actionmailer/README.rdoc#L36-L45
+      #   - Ruby `instance_eval` changes the block receiver:
+      #     https://docs.ruby-lang.org/en/3.4/BasicObject.html#method-i-instance_eval
+      context.instance_variables.each do |ivar|
+        next if internal_instance_variable?(ivar)
+
+        instance_variable_set(ivar, context.instance_variable_get(ivar))
+      end
+    end
+
+    def internal_instance_variable?(ivar)
+      INTERNAL_INSTANCE_VARIABLES.include?(ivar) || ivar.to_s.start_with?("@_")
+    end
+
+    def method_missing(method_name, *args, **kwargs, &block)
+      context = @goodmail_context
+      if context.respond_to?(method_name, true)
+        return context.__send__(method_name, *args, **kwargs, &block)
+      end
+
+      super
+    end
+
+    def respond_to_missing?(method_name, include_private = false)
+      @goodmail_context.respond_to?(method_name, true) || super
+    end
   end
 end

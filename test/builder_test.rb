@@ -2,6 +2,24 @@
 
 require "test_helper"
 
+class BuilderContextProbe
+  def initialize
+    @recipient_name = "Avery"
+    @_internal_lookup_context = "Action Mailer internals should not leak"
+    @parts = ["context internals should not leak"]
+  end
+
+  def dashboard_url(account_id:)
+    "https://example.test/accounts/#{account_id}"
+  end
+
+  private
+
+  def private_greeting
+    "private hello"
+  end
+end
+
 # Tests for `Goodmail::Builder` — the DSL evaluator that backs every
 # `Goodmail.compose { ... }` and `Goodmail.render { ... }` block.
 #
@@ -21,6 +39,43 @@ class BuilderTest < Minitest::Test
     assert_equal [], @builder.parts
     assert_equal [], @builder.attachments
     assert_equal "", @builder.html_output
+  end
+
+  def test_context_instance_variables_are_visible_inside_the_dsl_block
+    builder = Goodmail::Builder.new(context: BuilderContextProbe.new)
+
+    builder.instance_eval { text "Hello #{@recipient_name}" }
+
+    assert_includes builder.html_output, "Hello Avery"
+    assert_equal 1, builder.parts.length
+  end
+
+  def test_context_internal_instance_variables_are_not_copied_to_the_builder
+    builder = Goodmail::Builder.new(context: BuilderContextProbe.new)
+
+    refute builder.instance_variable_defined?(:@_internal_lookup_context)
+  end
+
+  def test_context_public_methods_are_delegated_from_the_dsl_block
+    builder = Goodmail::Builder.new(context: BuilderContextProbe.new)
+
+    builder.instance_eval { button "Open dashboard", dashboard_url(account_id: 42) }
+
+    assert_includes builder.html_output, 'href="https://example.test/accounts/42"'
+  end
+
+  def test_context_private_methods_are_delegated_like_unqualified_mailer_helpers
+    builder = Goodmail::Builder.new(context: BuilderContextProbe.new)
+
+    builder.instance_eval { text private_greeting }
+
+    assert_includes builder.html_output, "private hello"
+  end
+
+  def test_unknown_context_methods_still_raise_name_error
+    builder = Goodmail::Builder.new(context: BuilderContextProbe.new)
+
+    assert_raises(NameError) { builder.instance_eval { missing_goodmail_helper } }
   end
 
   def test_html_output_joins_parts_with_newlines
@@ -470,6 +525,7 @@ class BuilderTest < Minitest::Test
     assert_equal "PDF_BYTES", a[:content]
     assert_equal "application/pdf", a[:mime_type]
     assert_equal false, a[:inline]
+    assert_nil a[:content_id]
   end
 
   def test_attach_accepts_a_filesystem_path_and_reads_the_file
@@ -483,7 +539,7 @@ class BuilderTest < Minitest::Test
   end
 
   def test_attach_treats_NUL_byte_strings_as_binary_content_not_paths
-    # Regression guard for the 0.4.2 fix: `File.file?` raises ArgumentError
+    # Regression guard for the binary-content fix: `File.file?` raises ArgumentError
     # on Strings containing `\0`, and PNG / PDF / .ics bytes routinely
     # contain NUL bytes (PNG IHDR chunk length, PDF cross-reference
     # offsets, .ics produced through binary-safe transports, etc).
@@ -540,12 +596,29 @@ class BuilderTest < Minitest::Test
     assert_equal "logo.png", a[:filename]
     assert_equal "PNG_BYTES", a[:content]
     assert_equal true, a[:inline]
+    assert_match(/\A[0-9a-f]{24}\.logo\.png@inline\.goodmail\.invalid\z/, a[:content_id])
   end
 
   def test_inline_image_emits_an_img_tag_with_a_cid_reference
     @builder.instance_eval { inline_image "logo.png", "PNG_BYTES" }
+    content_id = @builder.attachments.first[:content_id]
     output = @builder.parts.first
-    assert_includes output, 'src="cid:logo.png"'
+    assert_includes output, %(src="cid:#{content_id}")
+  end
+
+  def test_inline_image_content_id_is_url_safe_when_filename_has_spaces
+    @builder.instance_eval { inline_image "hero image ü.png", "PNG_BYTES" }
+    content_id = @builder.attachments.first[:content_id]
+
+    assert_match(/\A[0-9a-f]{24}\.hero-image--\.png@inline\.goodmail\.invalid\z/, content_id)
+    assert_includes @builder.parts.first, %(src="cid:#{content_id}")
+  end
+
+  def test_inline_image_content_id_has_a_fallback_basename_when_filename_is_empty
+    @builder.instance_eval { inline_image "", "PNG_BYTES" }
+    content_id = @builder.attachments.first[:content_id]
+
+    assert_match(/\A[0-9a-f]{24}\.attachment@inline\.goodmail\.invalid\z/, content_id)
   end
 
   def test_inline_image_uses_company_name_alt_when_no_alt_passed
@@ -573,11 +646,9 @@ class BuilderTest < Minitest::Test
 
   def test_inline_image_raises_on_duplicate_filename
     # Two `inline_image` calls with the same filename produce broken
-    # output: both body refs point at `cid:FILENAME`, but Mail gem's
-    # CID resolution returns the first matching part — the second
-    # attachment has no addressable CID and renders as a broken icon.
-    # Better to fail loud at registration time than silently ship a
-    # broken image to recipients.
+    # output in custom Goodmail.render fan-out code because the
+    # attachments hash is keyed by filename. Better to fail loud at
+    # registration time than silently ship ambiguous inline parts.
     error = assert_raises(Goodmail::Error) do
       @builder.instance_eval do
         inline_image "logo.png", "FIRST"
@@ -586,8 +657,7 @@ class BuilderTest < Minitest::Test
     end
     assert_match(/duplicate inline filename/, error.message)
     assert_match(/logo\.png/, error.message)
-    assert_match(/cid:logo\.png/, error.message,
-                 "error message should explicitly mention the broken cid: reference")
+    assert_match(/distinct filename/, error.message)
   end
 
   def test_attach_allows_duplicate_filenames_for_non_inline_attachments

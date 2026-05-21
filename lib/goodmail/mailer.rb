@@ -18,7 +18,56 @@ module Goodmail
     # Action Mailer wraps the result in a MessageDelivery object.
     # It uses Premailer to inline CSS and generate plaintext.
     # @api internal
-    def compose_message(headers, raw_html_body, _raw_text_body, unsubscribe_url, dsl_attachments = [], preheader: nil)
+    def compose_message(
+      headers,
+      raw_html_body,
+      unsubscribe_url,
+      dsl_attachments = [],
+      preheader: nil,
+      render_config: nil
+    )
+      # `Goodmail.compose` renders the DSL/layout before returning an
+      # ActionMailer::MessageDelivery, but Action Mailer does not run this
+      # mailer action until `.message`, `.deliver_now`, or the delivery job
+      # materializes it. Re-install the effective render config here so the
+      # lazy action uses the same branding/footer settings as the already
+      # rendered HTML body.
+      # Sources:
+      # - ActionMailer::MessageDelivery lazy processing:
+      #   https://github.com/rails/rails/blob/097017cd861e4fc57fb7b2612a409538ff2677fc/actionmailer/lib/action_mailer/message_delivery.rb#L19-L31
+      # - Action Mailer deliver_later serializes only action arguments:
+      #   https://github.com/rails/rails/blob/097017cd861e4fc57fb7b2612a409538ff2677fc/actionmailer/lib/action_mailer/message_delivery.rb#L142-L155
+      Goodmail.with_config(render_config) do
+        compose_message_with_config(headers, raw_html_body, unsubscribe_url, dsl_attachments, preheader: preheader)
+      end
+    end
+
+    private
+
+    def compose_message_with_config(headers, raw_html_body, unsubscribe_url, dsl_attachments, preheader: nil)
+      inlined_html = inline_css(raw_html_body)
+
+      # The plaintext part runs through `Goodmail::Plaintext`, which
+      # pre-processes the source HTML (strips MSO-only blocks + the
+      # hidden preheader span) before Premailer extracts text. That's
+      # what stops the button label from duplicating in plaintext and
+      # the inbox-preview text from appearing as a phantom first line.
+      generated_plain_text = Goodmail::Plaintext.generate(raw_html_body, preheader: preheader)
+
+      goodmail_add_list_unsubscribe_headers!(headers, unsubscribe_url)
+      goodmail_apply_attachments!(dsl_attachments)
+
+      # Call the instance-level `mail` method
+      mail(headers) do |format|
+        # Use the premailer-generated plaintext
+        format.text { render plain: generated_plain_text.strip }
+        # Use the CSS-inlined HTML
+        format.html { render html: inlined_html.html_safe }
+      end
+      # Action Mailer automatically returns the MessageDelivery object
+    end
+
+    def inline_css(raw_html_body)
       # The HTML part: Premailer inlines all the CSS that's inlinable
       # and leaves the residual @media query block in <style>. The
       # MSO conditional comments survive (we need them for Outlook's
@@ -35,89 +84,7 @@ module Goodmail
                                 # charset>` would otherwise mangle every
                                 # accented character.
       )
-      inlined_html = premailer.to_inline_css
-
-      # The plaintext part runs through `Goodmail::Plaintext`, which
-      # pre-processes the source HTML (strips MSO-only blocks + the
-      # hidden preheader span) before Premailer extracts text. That's
-      # what stops the button label from duplicating in plaintext and
-      # the inbox-preview text from appearing as a phantom first line.
-      generated_plain_text = Goodmail::Plaintext.generate(raw_html_body, preheader: preheader)
-
-      # Add List-Unsubscribe + List-Unsubscribe-Post headers *before* calling
-      # `mail()`. RFC 8058 introduced the one-click HTTPS unsubscribe flow,
-      # and Gmail / Yahoo's Feb 2024 sender requirements made this header
-      # pair mandatory for bulk senders to avoid "unsubscribe is missing"
-      # being treated as a spam signal. The recipient's mail client posts
-      # the magic body `List-Unsubscribe=One-Click` to the URL when the
-      # user clicks "Unsubscribe" inline.
-      #
-      # Sources:
-      #   - RFC 8058 §3.1 (HTTPS one-click body):
-      #     https://www.rfc-editor.org/rfc/rfc8058#section-3.1
-      #   - Gmail bulk sender guidelines (one-click unsubscribe is required
-      #     for senders averaging over 5k messages/day to gmail.com):
-      #     https://support.google.com/mail/answer/81126
-      #   - Yahoo "Sender Best Practices" (matching requirements):
-      #     https://senders.yahooinc.com/best-practices/
-      if unsubscribe_url.is_a?(String) && !unsubscribe_url.strip.empty?
-        headers["List-Unsubscribe"] = "<#{unsubscribe_url.strip}>"
-        # The Post header tells well-behaved mail clients (Gmail, Apple
-        # Mail, Outlook) that they may POST the one-click body directly
-        # to the URL, avoiding the round-trip through the user's browser.
-        # Senders that don't yet implement the POST endpoint should still
-        # set this header — Gmail simply falls back to opening the URL.
-        headers["List-Unsubscribe-Post"] = "List-Unsubscribe=One-Click"
-      end
-
-      # Apply DSL-collected attachments to the mailer's attachments hash.
-      # Action Mailer's `attachments[]=` and `attachments.inline[]=` are the
-      # only documented ways to attach binary parts to the outgoing message;
-      # we route DSL `attach` calls through here so the Builder block can
-      # stay free of Mailer-internal references.
-      # Source: https://guides.rubyonrails.org/action_mailer_basics.html#sending-email-with-attachments
-      Array(dsl_attachments).each do |attachment|
-        target = attachment[:inline] ? attachments.inline : attachments
-        if attachment[:mime_type].to_s.strip.empty?
-          target[attachment[:filename]] = attachment[:content]
-        else
-          target[attachment[:filename]] = {
-            mime_type: attachment[:mime_type],
-            content: attachment[:content]
-          }
-        end
-
-        # Pin the inline part's `Content-ID` to the filename so that
-        # `inline_image("logo.png", ...)` (which emits `<img
-        # src="cid:logo.png">` in the body) resolves to THIS part. By
-        # default, Mail gem auto-generates a globally-unique Content-ID
-        # of the shape `<longhash@host.tld.mail>` — that makes the
-        # body's `cid:logo.png` reference dangle and the image renders
-        # as a broken-icon in every email client.
-        #
-        # Sources:
-        #   - RFC 2392 (CID URLs reference the part's Content-ID
-        #     header): https://www.rfc-editor.org/rfc/rfc2392
-        #   - Mail::Part#content_id setter:
-        #     https://github.com/mikel/mail/blob/master/lib/mail/parts_list.rb
-        #     (mail gem auto-assigns CIDs when none is set; passing one
-        #     overrides the default).
-        if attachment[:inline]
-          # `attachments[filename]` returns the Mail::Part regardless
-          # of whether it was added to `attachments` or
-          # `attachments.inline`, so we can address it uniformly here.
-          attachments[attachment[:filename]].content_id = "<#{attachment[:filename]}>"
-        end
-      end
-
-      # Call the instance-level `mail` method
-      mail(headers) do |format|
-        # Use the premailer-generated plaintext
-        format.text { render plain: generated_plain_text.strip }
-        # Use the CSS-inlined HTML
-        format.html { render html: inlined_html.html_safe }
-      end
-      # Action Mailer automatically returns the MessageDelivery object
+      premailer.to_inline_css
     end
   end
 end

@@ -1,6 +1,7 @@
 # frozen_string_literal: true
 
 require "test_helper"
+require "tempfile"
 
 # End-to-end tests for `Goodmail.compose` — the public, top-level API
 # documented in the README. These tests verify the gem from the user's
@@ -43,6 +44,40 @@ class ComposeTest < Minitest::Test
     assert_includes msg.text_part.body.decoded, "hello world"
   end
 
+  def test_compose_passes_ActionMailer_headers_through_after_stripping_Goodmail_options
+    sent_at = Time.utc(2026, 5, 21, 12, 30, 0)
+    msg = Goodmail.compose(
+      to: "u@x.co",
+      from: "n@x.co",
+      subject: "Headers",
+      date: sent_at,
+      "X-Correlation-ID" => "abc-123",
+      preheader: "Preview",
+      unsubscribe_url: "https://example.com/u"
+    ) { text "hello" }.message
+
+    assert_equal sent_at.to_datetime, msg.date
+    assert_equal "abc-123", msg["X-Correlation-ID"].value
+    assert_nil msg["preheader"]
+    assert_nil msg["unsubscribe_url"]
+  end
+
+  def test_compose_uses_custom_layout_path_without_leaking_it_as_a_mail_header
+    Tempfile.create(["goodmail-compose-layout", ".erb"]) do |file|
+      file.write("<html><body>CUSTOM-LAYOUT <%= body_html %></body></html>")
+      file.flush
+
+      msg = Goodmail.compose(
+        to: "u@x.co", from: "n@x.co", subject: "Custom layout",
+        layout_path: file.path
+      ) { text "custom body" }.message
+
+      assert_includes msg.html_part.body.decoded, "CUSTOM-LAYOUT"
+      assert_includes msg.html_part.body.decoded, "custom body"
+      assert_nil msg["layout_path"]
+    end
+  end
+
   def test_compose_can_be_called_with_only_required_headers_no_block
     # Edge case from the dispatcher: no block. The compose path should
     # still produce a deliverable Mail::Message.
@@ -53,7 +88,8 @@ class ComposeTest < Minitest::Test
 
   def test_compose_emits_RFC_8058_one_click_unsubscribe_header_pair
     # End-to-end check that the gem's headline deliverability fix is in
-    # the encoded message a real MTA would forward.
+    # the encoded message a real MTA would forward. RFC 8058 requires
+    # the one-click URL to be HTTPS.
     msg = Goodmail.compose(
       to: "u@x.co", from: "n@x.co", subject: "Unsub",
       unsubscribe_url: "https://example.com/u/42"
@@ -62,6 +98,16 @@ class ComposeTest < Minitest::Test
     encoded = msg.encoded
     assert_includes encoded, "List-Unsubscribe: <https://example.com/u/42>"
     assert_includes encoded, "List-Unsubscribe-Post: List-Unsubscribe=One-Click"
+  end
+
+  def test_compose_does_not_emit_one_click_post_for_http_unsubscribe_url
+    msg = Goodmail.compose(
+      to: "u@x.co", from: "n@x.co", subject: "Unsub",
+      unsubscribe_url: "http://example.com/u/42"
+    ) { text "hi" }.message
+
+    assert_equal "<http://example.com/u/42>", msg["List-Unsubscribe"].value
+    assert_nil msg["List-Unsubscribe-Post"]
   end
 
   def test_compose_inline_image_round_trips_through_a_real_delivery
@@ -76,11 +122,11 @@ class ComposeTest < Minitest::Test
     hero = msg.attachments.find { |a| a.filename == "hero.png" }
     refute_nil hero
     assert hero.inline?
-    assert_equal "<hero.png>", hero.content_id
+    assert_match(/\A<[0-9a-f]{24}\.hero\.png@inline\.goodmail\.invalid>\z/, hero.content_id)
 
-    # The body's `<img src="cid:hero.png">` reference resolves to the
-    # part above — the round-trip property the 0.4.2 fix locked in.
-    assert_match(/<img[^>]+src="cid:hero\.png"/, msg.html_part.body.decoded)
+    # The body's generated `cid:` reference resolves to the part above.
+    content_id = hero.content_id.delete_prefix("<").delete_suffix(">")
+    assert_match(/<img[^>]+src="cid:#{Regexp.escape(content_id)}"/, msg.html_part.body.decoded)
   end
 
   def test_compose_uses_global_config_brand_color_in_the_button
@@ -101,6 +147,44 @@ class ComposeTest < Minitest::Test
     ) { sign }.message
 
     assert_includes msg.html_part.body.decoded, "Acme Inc."
+  end
+
+  def test_compose_accepts_a_per_message_config_override
+    GoodmailTestConfig.configure(company_name: "Global Co.", brand_color: "#111827")
+
+    msg = Goodmail.compose(
+      to: "u@x.co", from: "n@x.co", subject: "S",
+      config: { company_name: "Tenant Co.", brand_color: "#ff5500", unsubscribe_url: "https://tenant.example/u" }
+    ) do
+      button "Click me", "https://example.com"
+      sign
+    end.message
+
+    assert_includes msg.html_part.body.decoded, "Tenant Co."
+    assert_includes msg.html_part.body.decoded, "#ff5500"
+    assert_equal "<https://tenant.example/u>", msg["List-Unsubscribe"].value
+    assert_nil msg["config"]
+    assert_equal "Global Co.", Goodmail.config.company_name
+  end
+
+  def test_compose_snapshots_effective_config_for_lazy_message_materialization
+    GoodmailTestConfig.configure(company_name: "OriginalCo", brand_color: "#111827")
+    delivery = Goodmail.compose(
+      to: "u@x.co", from: "n@x.co", subject: "Lazy config"
+    ) do
+      image "https://cdn.example.com/banner.png"
+      text "Body after image"
+    end
+
+    refute delivery.processed?
+
+    GoodmailTestConfig.configure(company_name: "ChangedCo", brand_color: "#000000")
+    msg = delivery.message
+
+    assert_includes msg.html_part.body.decoded, "OriginalCo"
+    refute_includes msg.html_part.body.decoded, "ChangedCo"
+    assert_includes msg.text_part.body.decoded, "Body after image"
+    refute_match(/^OriginalCo$/, msg.text_part.body.decoded)
   end
 
   def test_compose_full_kitchen_sink_block_round_trips
@@ -166,7 +250,7 @@ class ComposeTest < Minitest::Test
       "Fine print and disclaimers.",
       "Open the receipt", "https://example.com/r/1",
       "https://cdn.example.com/banner.png",
-      "cid:logo.png",
+      "inline.goodmail.invalid",
       "Test Co.", # signature
       "Kitchen sink preview" # preheader
     ].each do |needle|
