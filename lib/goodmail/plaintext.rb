@@ -216,7 +216,7 @@ module Goodmail
     #
     # We strip standalone lines that EXACTLY match the company name.
     # This is conservative: a message with the company name embedded
-    # in a sentence ("Welcome to ExampleApp, where we share rides")
+    # in a sentence ("Welcome to ExampleApp, thanks for joining")
     # is preserved verbatim — only lines that are nothing but the
     # bare company name are removed.
     def strip_company_name_alt_line(text)

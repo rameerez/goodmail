@@ -157,9 +157,9 @@ class PlaintextTest < Minitest::Test
     # the company name are stripped. If someone writes "Welcome to
     # Acme" the sentence survives untouched.
     GoodmailTestConfig.configure(company_name: "Acme")
-    html = layout_html_with(text_body: "<p>Welcome to Acme, where we share rides.</p>")
+    html = layout_html_with(text_body: "<p>Welcome to Acme, thanks for joining.</p>")
     text = Goodmail::Plaintext.generate(html)
-    assert_includes text, "Welcome to Acme, where we share rides."
+    assert_includes text, "Welcome to Acme, thanks for joining."
   end
 
   # ── BUG already fixed before this round, regression-tested here ────
@@ -205,39 +205,39 @@ class PlaintextTest < Minitest::Test
     # into the conventional `Label: Value` shape every other
     # transactional sender uses.
     body = build_dsl do
-      info_row "Distancia", "18 km"
-      info_row "Duración", "25 min"
+      info_row "Código", "ABC-123"
+      info_row "Categoría", "Premium"
     end
     text = Goodmail::Plaintext.generate(layout_html_with(text_body: body))
-    assert_includes text, "Distancia: 18 km"
-    assert_includes text, "Duración: 25 min"
-    refute_match(/^Distancia\nDuración/, text, "label and value must NOT be on separate lines")
+    assert_includes text, "Código: ABC-123"
+    assert_includes text, "Categoría: Premium"
+    refute_match(/^Código\nCategoría/, text, "label and value must NOT be on separate lines")
   end
 
   def test_multiple_info_rows_render_as_distinct_lines_not_one_run_on
     body = build_dsl do
-      info_row "Distance", "18 km"
-      info_row "Duration", "25 min"
-      info_row "Driver", "Lola"
+      info_row "Status", "Active"
+      info_row "Plan", "Pro"
+      info_row "Reference", "ABC-123"
     end
     text = Goodmail::Plaintext.generate(layout_html_with(text_body: body))
     # Each Label: Value pair lives on its own line (with a blank
     # paragraph separator).
-    assert_match(/Distance: 18 km/, text)
-    assert_match(/Duration: 25 min/, text)
-    assert_match(/Driver: Lola/, text)
+    assert_match(/Status: Active/, text)
+    assert_match(/Plan: Pro/, text)
+    assert_match(/Reference: ABC-123/, text)
     # And they're separate paragraphs, not concatenated.
-    refute_match(/Distance: 18 km Duration:/, text)
+    refute_match(/Status: Active Plan:/, text)
   end
 
   def test_info_row_html_part_keeps_the_two_cell_table_for_pretty_visual_rendering
     # Check the OTHER side of the contract: in the HTML part the
     # two-cell table survives intact (the flatten is plaintext-only).
-    body = build_dsl { info_row "Distancia", "18 km" }
+    body = build_dsl { info_row "Código", "ABC-123" }
     full_html = compose_full_layout(text_body: body)
     assert_match(/<table[^>]*goodmail-info-row[^>]*>/, full_html)
-    assert_match(/<td[^>]*>Distancia<\/td>/, full_html)
-    assert_match(/<td[^>]*>18 km<\/td>/, full_html)
+    assert_match(/<td[^>]*>Código<\/td>/, full_html)
+    assert_match(/<td[^>]*>ABC-123<\/td>/, full_html)
   end
 
   def test_info_row_flatten_falls_back_to_unmodified_html_when_nokogiri_raises
@@ -252,7 +252,7 @@ class PlaintextTest < Minitest::Test
       raise "synthetic parser error"
     end
 
-    body = build_dsl { info_row "Distancia", "18 km" }
+    body = build_dsl { info_row "Código", "ABC-123" }
 
     # Capture stderr so the test isn't noisy on a clean run AND we
     # can assert on the warning shape.
@@ -295,7 +295,7 @@ class PlaintextTest < Minitest::Test
     # every UTF-8 character (each byte in the multi-byte sequence gets
     # re-encoded as if it were a Latin-1 char). Goodmail pins
     # `input_encoding: "UTF-8"` on every Premailer call so even a
-    # custom layout without the meta tag round-trips Spanish / French /
+    # custom layout without the meta tag preserves Spanish / French /
     # German accented characters cleanly.
     html = "<html><body><p>Duración: 25 min</p><p>Precio: 2,50 €</p></body></html>"
     text = Goodmail::Plaintext.generate(html)
@@ -306,36 +306,36 @@ class PlaintextTest < Minitest::Test
   end
 
   def test_accented_characters_survive_in_compose_path_too
-    # Same UTF-8 round-trip from the public compose entry point so a
+    # Same UTF-8 preservation check from the public compose entry point so a
     # future regression in either the HTML or plaintext path surfaces.
     GoodmailTestConfig.configure(company_name: "Acme")
     Goodmail.compose(
       to: "u@x.co", from: "n@x.co", subject: "Subj"
     ) do
-      text "Bienvenido a ExampleApp, donde compartimos viajes."
-      info_row "Duración", "25 min"
-      info_row "Distancia", "18 km"
-      info_row "Precio", "2,50 €"
+      text "Bienvenido a ExampleApp, gracias por usar nuestro servicio."
+      info_row "Código", "ABC-123"
+      info_row "Categoría", "Premium"
+      info_row "Importe", "2,50 €"
       sign
     end.deliver_now
 
     msg = ActionMailer::Base.deliveries.last
     text = msg.text_part.body.decoded
     [
-      "Bienvenido", "Duración", "Distancia", "Precio", "2,50 €", "viajes"
+      "Bienvenido", "Código", "Categoría", "Importe", "2,50 €", "servicio"
     ].each do |needle|
       assert_includes text, needle, "plaintext should preserve UTF-8: #{needle.inspect}"
     end
     # And the same for the HTML part — Premailer is invoked there too,
     # with the same encoding gotcha.
     html = msg.html_part.body.decoded
-    [ "Bienvenido", "Duración", "Distancia", "Precio", "2,50 €", "viajes" ].each do |needle|
+    [ "Bienvenido", "Código", "Categoría", "Importe", "2,50 €", "servicio" ].each do |needle|
       assert_includes html, needle, "HTML should preserve UTF-8: #{needle.inspect}"
     end
   end
 
   def test_accented_characters_in_emoji_and_high_BMP_codepoints
-    # CJK + emoji round-trip as a stronger Unicode guarantee than
+    # CJK + emoji preservation as a stronger Unicode guarantee than
     # Latin-1-extension accents. If we ever silently downgrade to
     # Latin-1 these will manifest as `?` placeholders.
     html = "<html><body><p>こんにちは 🚗 résumé Übung</p></body></html>"

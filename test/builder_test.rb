@@ -309,40 +309,40 @@ class BuilderTest < Minitest::Test
   # ── info_row ─────────────────────────────────────────────────────────
 
   def test_info_row_emits_a_two_cell_presentation_table
-    @builder.instance_eval { info_row "Distance", "18 km" }
+    @builder.instance_eval { info_row "Status", "Active" }
     output = @builder.parts.first
     assert_match(/<table[^>]*role="presentation"/, output)
-    assert_match(/<td[^>]*>Distance<\/td>/, output)
-    assert_match(/<td[^>]*>18 km<\/td>/, output)
+    assert_match(/<td[^>]*>Status<\/td>/, output)
+    assert_match(/<td[^>]*>Active<\/td>/, output)
   end
 
   def test_info_row_label_uses_muted_grey
-    @builder.instance_eval { info_row "Distance", "18 km" }
+    @builder.instance_eval { info_row "Status", "Active" }
     output = @builder.parts.first
     # First <td> is the label cell.
-    label_cell = output[/<td[^>]*?>Distance<\/td>/]
+    label_cell = output[/<td[^>]*?>Status<\/td>/]
     assert_includes label_cell, "color:#6b7280"
     assert_includes label_cell, "font-weight:400"
   end
 
   def test_info_row_value_uses_dark_text_and_email_safe_align_attribute
-    @builder.instance_eval { info_row "Distance", "18 km" }
+    @builder.instance_eval { info_row "Status", "Active" }
     output = @builder.parts.first
     # Email clients vary on whether `text-align: right` (CSS) survives
     # Premailer + their own renderer; the `align="right"` HTML attribute
     # is the email-safe fallback. We intentionally emit both.
-    value_cell = output[/<td[^>]*?>18 km<\/td>/]
+    value_cell = output[/<td[^>]*?>Active<\/td>/]
     assert_includes value_cell, 'align="right"'
     assert_includes value_cell, "font-weight:600"
     assert_includes value_cell, "color:#111827"
   end
 
   def test_info_row_html_escapes_both_label_and_value
-    @builder.instance_eval { info_row "<b>Distance</b>", "<script>x</script>" }
+    @builder.instance_eval { info_row "<b>Status</b>", "<script>x</script>" }
     output = @builder.parts.first
-    refute_match(/<b>Distance<\/b>/, output)
+    refute_match(/<b>Status<\/b>/, output)
     refute_match(/<script>/, output)
-    assert_includes output, "&lt;b&gt;Distance&lt;/b&gt;"
+    assert_includes output, "&lt;b&gt;Status&lt;/b&gt;"
     assert_includes output, "&lt;script&gt;x&lt;/script&gt;"
   end
 
@@ -703,8 +703,8 @@ class BuilderTest < Minitest::Test
       h1 "Hello"
       text "Body 1"
       space 24
-      info_row "Distance", "18 km"
-      info_row "Duration", "25 min"
+      info_row "Status", "Active"
+      info_row "Plan", "Pro"
       button "CTA", "https://x.co"
       line
       sign

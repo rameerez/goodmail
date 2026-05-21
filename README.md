@@ -106,7 +106,7 @@ mail = Goodmail.compose(
   to: recipient.email,
   from: "'#{Goodmail.config.company_name} Support' <support@myapp.com>",
   subject: "Welcome to MyApp!",
-  preheader: "Your adventure begins now!" # Optional override
+  preheader: "Your account is ready." # Optional override
 ) do
   h1 "Welcome aboard, #{recipient.name}!"
   text "We're thrilled to have you join the MyApp community."
@@ -179,7 +179,7 @@ Inside the `Goodmail.compose` block, you have access to these methods:
 *   `center { ... }`: Centers the content generated within the block.
 *   `code_box(text)`: Displays text centered and bold within a styled box (grey background, padding, italic). Text is HTML-escaped.
 *   `price_row(name, price)`: Adds a styled paragraph showing a name and price, separated by a top border (e.g., for simple receipt line items). Both the name and the price render bold and centered — meant for cases where label and amount carry equal weight. Text is HTML-escaped.
-*   `info_row(label, value)`: Adds a label/value row using the email-safe two-column table pattern (muted label on the left, dark right-aligned value on the right, 1px hairline at the bottom). Use this when the LABEL is supporting context and the VALUE is the primary content ("Distance — 18 km", "Driver — Lola Garcia"). Stack multiple consecutive `info_row` calls to build a clean info card. Text is HTML-escaped.
+*   `info_row(label, value)`: Adds a label/value row using the email-safe two-column table pattern (muted label on the left, dark right-aligned value on the right, 1px hairline at the bottom). Use this when the LABEL is supporting context and the VALUE is the primary content ("Plan - Pro", "Status - Active"). Stack multiple consecutive `info_row` calls to build a clean info card. Text is HTML-escaped.
 *   `sign(name = Goodmail.config.company_name)`: Adds a standard closing signature line.
 *   `html(raw_html_string)`: **Use with extreme caution.** Allows embedding raw, *un-sanitized* HTML.
 

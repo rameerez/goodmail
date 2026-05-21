@@ -48,7 +48,7 @@ module Goodmail
       # Email-level attachments collected via the `attach` DSL method. Stored as
       # `[{ filename:, content:, mime_type: }, ...]` and consumed by the
       # internal `Goodmail::Mailer` (via `Goodmail::Dispatcher`) before the
-      # `mail()` call so they ride along on the outgoing message. We collect
+      # `mail()` call so they are forwarded on the outgoing message. We collect
       # here (rather than calling `attachments[]=` directly on a mailer
       # instance) because the DSL block is `instance_eval`'d on the Builder
       # — it has no Mailer context and can't reach into ActionMailer's
@@ -123,9 +123,9 @@ module Goodmail
     # NOTE: This does not create a table structure. The visual is bold,
     # centered, and separator-bordered — designed for receipt-style line
     # items where the LABEL and the AMOUNT carry equal weight ("Premium
-    # plan — $49.00", "Tax — $4.90"). For label/value rows where the
+    # plan - $49.00", "Tax - $4.90"). For label/value rows where the
     # label is supporting context and the value is the primary content
-    # ("Distance — 18 km", "Driver — Lola"), prefer `info_row` below.
+    # ("Plan - Pro", "Status - Active"), prefer `info_row` below.
     def price_row(name, price)
       parts << %(<p style="font-family: 'Helvetica Neue',Helvetica,Arial,sans-serif; font-size: 14px; font-weight:bold; text-align:center; border-top:1px solid #eaeaea; padding:14px 0; margin: 0;">#{h name} &nbsp; &ndash; &nbsp; #{h price}</p>)
     end
@@ -204,14 +204,14 @@ module Goodmail
     end
 
     # Inline styled link as a paragraph. Wraps `button` for cases where a full
-    # call-to-action button is too heavy — e.g. "View receipt", "Open the trip
-    # in the app", "Read the full policy". The link is rendered in the
+    # call-to-action button is too heavy — e.g. "View receipt", "Open the
+    # account", "Read the full policy". The link is rendered in the
     # configured brand color and underlined, matching the layout's `a {}` rule
     # so the visual stays consistent in clients that strip inline styles.
     #
     # Both `text` and `url` are HTML-escaped to prevent any accidental injection
-    # from interpolated user content (e.g. a passenger name in a label, a
-    # trip URL with arbitrary query strings).
+    # from interpolated user content (e.g. a customer name in a label, a
+    # URL with arbitrary query strings).
     def link(text, url)
       parts << %(<p style="margin:16px 0; line-height: 1.6;"><a href="#{h url}" style="color:#{Goodmail.config.brand_color}; text-decoration:underline;">#{h text}</a></p>)
     end

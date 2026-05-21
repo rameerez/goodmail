@@ -205,8 +205,8 @@ class ComposeTest < Minitest::Test
       h3 "Small title"
       text "<strong>Important:</strong> this email exercises every DSL surface."
       space 24
-      info_row "Distance", "18 km"
-      info_row "Duration", "25 min"
+      info_row "Status", "Active"
+      info_row "Plan", "Pro"
       price_row "Premium plan", "$49.00"
       code_box "ABC-123"
       center { text "centered text" }
@@ -242,7 +242,7 @@ class ComposeTest < Minitest::Test
     [
       "Big Title", "Mid title", "Small title",
       "<strong>Important:</strong>",
-      "Distance", "18 km", "Duration", "25 min",
+      "Status", "Active", "Plan", "Pro",
       "Premium plan", "$49.00",
       "ABC-123",
       "centered text",
