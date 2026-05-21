@@ -9,7 +9,7 @@ Goodmail turns your ugly, default, text-only emails into SaaS-ready emails. It's
 
 You can easily add buttons, images, links, price lines, and text to your emails, and it'll look good everywhere, no styling needed.
 
-Here's the catch: there's only one template. You can't change it. You're guaranteed you'll send good emails, but the cost is you don't have much flexibility. If you're okay with this, welcome to `goodmail`! You'll be shipping decent emails that look great everywhere in no time.
+Here's the catch: Goodmail gives you one opinionated default template. You can override the layout for advanced cases, but the happy path is deliberately narrow: no templates, no partials, and no styling decisions for every transactional email. If you're okay with this, welcome to `goodmail`! You'll be shipping decent emails that look great everywhere in no time.
 
 (And you can still use Action Mailer for all other template-intensive emails – Goodmail doesn't replace Action Mailer, just builds on top of it!)
 
@@ -140,6 +140,11 @@ same headers you would pass to Action Mailer's `mail()` (`reply_to:`,
 Goodmail strips only its own render options before handing the message to
 Action Mailer.
 
+For real Rails mailer classes, prefer the auto-installed `goodmail_mail`
+helper shown below. It keeps the work inside the mailer action, preserves
+Action Mailer's lazy `MessageDelivery` / `deliver_later` model, and avoids
+manual `Goodmail.render(..., context: self)` glue.
+
 ## Why does `goodmail` exist?
 
 Here's the problem: you can't just use standard HTML and CSS in mails.
@@ -183,19 +188,7 @@ Inside the `Goodmail.compose` block, you have access to these methods:
 *   `sign(name = Goodmail.config.company_name)`: Adds a standard closing signature line.
 *   `html(raw_html_string)`: **Use with extreme caution.** Allows embedding raw, *un-sanitized* HTML.
 
-### Advanced: Rendering Email Parts with `Goodmail.render`
-
-For advanced use cases where you need direct access to the generated HTML and
-plain text parts before sending, Goodmail provides the `Goodmail.render` method.
-
-This method processes your DSL block, applies the layout, runs Premailer for CSS inlining, and performs plain text cleanup, similar to `Goodmail.compose`. However, instead of returning an `ActionMailer::MessageDelivery` ready for delivery, it returns a `Goodmail::EmailParts` struct.
-
-The `Goodmail::EmailParts` struct (defined in `goodmail/email.rb`) has three attributes:
-*   `html`: The final, inlined HTML content for your email.
-*   `text`: The cleaned-up plain text version of your email.
-*   `attachments`: An array of `{ filename:, content:, mime_type:, inline:, content_id: }` hashes for every `attach` / `inline_image` call inside the DSL block. Empty array when the DSL didn't register any attachments. `content_id` is present for inline attachments and already matches any `cid:` URL emitted by `inline_image`. `goodmail_mail` / `goodmail_render_parts` / `goodmail_mail_parts` hand these descriptors to Action Mailer for you.
-
-**How to use it:**
+### Rails Mailers: Use `goodmail_mail`
 
 When Goodmail is loaded, Rails mailers get three private helpers automatically:
 `goodmail_mail` for the common render-and-send path, and
@@ -205,9 +198,9 @@ When Goodmail is loaded, Rails mailers get three private helpers automatically:
 # In your custom mailer, including framework overrides such as Devise or Pay
 
 # Define your headers (to, from, subject, etc.)
-# You can pass :unsubscribe_url, :preheader, :locale, :config, and
-# :layout_path in the same hash. Goodmail uses them for rendering and strips
-# them before calling Action Mailer's mail().
+# You can pass :unsubscribe_url, :preheader, :locale, :config /
+# :configuration, and :layout_path in the same hash. Goodmail uses them for
+# rendering and strips them before calling Action Mailer's mail().
 class NotificationMailer < ApplicationMailer
   def important_update(recipient)
     details_url = view_details_url(recipient)
@@ -234,7 +227,8 @@ Content-IDs, and adds the correct `List-Unsubscribe` headers.
 Any normal Action Mailer header you pass (`date:`, `return_path:`,
 `delivery_method:`, `"X-Custom"`, etc.) is forwarded to `mail()`; only
 Goodmail render options such as `preheader:`, `unsubscribe_url:`, `locale:`,
-`config:`, and `layout_path:` are removed from the wire headers.
+`context:`, `config:` / `configuration:`, and `layout_path:` are removed from
+the wire headers.
 The block keeps normal mailer context: instance variables and private mailer
 helpers are available, and `locale:` wraps the DSL block in `I18n.with_locale`.
 
@@ -256,6 +250,18 @@ class DeviseGoodmailer < Devise::Mailer
   end
 end
 ```
+
+### Advanced: Rendering Email Parts with `Goodmail.render`
+
+For advanced use cases where you need direct access to the generated HTML and
+plain text parts before sending, Goodmail provides the `Goodmail.render` method.
+
+This method processes your DSL block, applies the layout, runs Premailer for CSS inlining, and performs plain text cleanup, similar to `Goodmail.compose`. However, instead of returning an `ActionMailer::MessageDelivery` ready for delivery, it returns a `Goodmail::EmailParts` struct.
+
+The `Goodmail::EmailParts` struct (defined in `goodmail/email.rb`) has three attributes:
+*   `html`: The final, inlined HTML content for your email.
+*   `text`: The cleaned-up plain text version of your email.
+*   `attachments`: An array of `{ filename:, content:, mime_type:, inline:, content_id: }` hashes for every `attach` / `inline_image` call inside the DSL block. Empty array when the DSL didn't register any attachments. `content_id` is present for inline attachments and already matches any `cid:` URL emitted by `inline_image`. `goodmail_mail` / `goodmail_render_parts` / `goodmail_mail_parts` hand these descriptors to Action Mailer for you.
 
 If you truly need to render first because another step must inspect or mutate
 the generated parts before sending, use the lower-level helpers:
@@ -289,6 +295,7 @@ end
 
 *   **Return Value**: `Goodmail.render` returns an instance of `Goodmail::EmailParts` (e.g., `EmailParts.new(html: "...", text: "...")`). `Goodmail.compose` returns an `ActionMailer::MessageDelivery`.
 *   **Purpose**: `Goodmail.render` is primarily for generating and retrieving processed email content parts. `Goodmail.compose` is for generating a complete, deliverable Action Mailer message.
+*   **Lazy delivery model**: `Goodmail.compose` evaluates the Ruby DSL block before returning the `ActionMailer::MessageDelivery`, then passes already rendered HTML, plaintext, and attachment descriptors into Goodmail's internal mailer action. Ruby blocks are not Active Job-serializable, so this is the right one-shot API. For fully native Action Mailer action execution in app mailers, use `goodmail_mail` inside the mailer method.
 *   **List-Unsubscribe Headers**: `Goodmail.render` itself does *not* add the `List-Unsubscribe` or `List-Unsubscribe-Post` headers to any mail object (as it doesn't create one). The auto-installed Action Mailer helpers add them when you call `goodmail_mail` / `goodmail_mail_parts`; they set one-click `List-Unsubscribe-Post` only for HTTPS URLs. Gmail's and Yahoo's [bulk-sender requirements](https://support.google.com/mail/answer/81126) treat missing one-click unsubscribe support as a spam signal for eligible bulk senders. Your delivery stack must also DKIM-sign the unsubscribe headers; Goodmail can set the headers, but the final sender/provider controls the signature.
 *   **Attachments + inline images**: `Goodmail.render` collects every `attach` / `inline_image` call into `parts.attachments`. The auto-installed Action Mailer helpers fan those descriptors into Action Mailer's attachments hash and pins inline Content-IDs for you. `Goodmail.compose` handles both internally.
 *   **Per-message branding**: pass `config: { company_name:, logo_url:, brand_color:, footer_text: }` to `Goodmail.compose`, `Goodmail.render`, `goodmail_mail`, or `goodmail_render_parts` for tenant / product whitelabel emails. The override is scoped to that render in the current thread, so apps do not need to mutate global `Goodmail.config` around a delivery.

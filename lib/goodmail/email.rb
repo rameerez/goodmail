@@ -34,6 +34,7 @@ module Goodmail
     render_config = render_header_value!(current_headers, :config)
     render_config = render_header_value!(current_headers, :configuration) if render_config.nil?
     layout_path = render_header_value!(current_headers, :layout_path)
+    subject = render_header_value!(current_headers, :subject)
 
     Goodmail.with_config(render_config) do
       builder = Goodmail::Builder.new(context: context)
@@ -42,15 +43,15 @@ module Goodmail
 
       # 2. Determine unsubscribe_url and preheader
       #    These are removed from headers as they are Goodmail-specific, not standard mail headers.
-      unsubscribe_url = current_headers.delete(:unsubscribe_url) || Goodmail.config.unsubscribe_url
-      preheader = current_headers.delete(:preheader) || Goodmail.config.default_preheader || current_headers[:subject]
+      unsubscribe_url = render_header_value!(current_headers, :unsubscribe_url) || Goodmail.config.unsubscribe_url
+      preheader = render_header_value!(current_headers, :preheader) || Goodmail.config.default_preheader || subject
 
       # 3. Render the raw HTML body using the Layout
       #    The subject is passed for the <title> tag and potentially other uses in layout.
       #    Unsubscribe URL and preheader are passed for inclusion in the layout.
       raw_html_body = Goodmail::Layout.render(
         core_html_content,
-        current_headers[:subject], # Use subject from (potentially modified) current_headers
+        subject,
         layout_path: layout_path,
         unsubscribe_url: unsubscribe_url,
         preheader: preheader

@@ -3,7 +3,8 @@
 require "test_helper"
 
 # Tests for `Goodmail::Dispatcher` — the orchestration layer that wires
-# Builder + Layout + Mailer together for the `Goodmail.compose(...)` path.
+# `Goodmail.render` to the internal Action Mailer handoff for the
+# `Goodmail.compose(...)` path.
 #
 # We exercise the dispatcher directly here (`Goodmail::Dispatcher.build_message`)
 # because `Goodmail.compose` is just a one-line delegate and the dispatcher

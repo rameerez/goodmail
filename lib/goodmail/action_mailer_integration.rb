@@ -55,7 +55,7 @@ module Goodmail
   # framework-only render keys internally; Goodmail should follow that shape
   # instead of maintaining a narrow whitelist of envelope fields.
   # Source:
-  # https://github.com/rails/rails/blob/097017cd861e4fc57fb7b2612a409538ff2677fc/actionmailer/lib/action_mailer/base.rb#L972-L976
+  # https://github.com/rails/rails/blob/debbd18c562df17d01944c475e9291d927910b58/actionmailer/lib/action_mailer/base.rb#L972-L976
   def self.action_mailer_headers(headers)
     headers.each_with_object({}) do |(key, value), result|
       next if render_header_key?(key)
@@ -77,7 +77,7 @@ module Goodmail
   # actions through `action_methods`; keeping the API private prevents Rails
   # from treating helpers as deliverable actions.
   # Source:
-  # https://github.com/rails/rails/blob/097017cd861e4fc57fb7b2612a409538ff2677fc/actionmailer/lib/action_mailer/base.rb#L614-L618
+  # https://github.com/rails/rails/blob/debbd18c562df17d01944c475e9291d927910b58/actionmailer/lib/action_mailer/base.rb#L614-L618
   def self.install_action_mailer_integration!(base = ActionMailer::Base)
     return if base < ActionMailerIntegration
 
@@ -105,9 +105,9 @@ module Goodmail
     # message.
     # Sources:
     # - `mail` creates parts and finalizes content type:
-    #   https://github.com/rails/rails/blob/097017cd861e4fc57fb7b2612a409538ff2677fc/actionmailer/lib/action_mailer/base.rb#L875-L907
+    #   https://github.com/rails/rails/blob/debbd18c562df17d01944c475e9291d927910b58/actionmailer/lib/action_mailer/base.rb#L875-L907
     # - late attachments raise:
-    #   https://github.com/rails/rails/blob/097017cd861e4fc57fb7b2612a409538ff2677fc/actionmailer/lib/action_mailer/base.rb#L766-L781
+    #   https://github.com/rails/rails/blob/debbd18c562df17d01944c475e9291d927910b58/actionmailer/lib/action_mailer/base.rb#L766-L781
     def goodmail_mail(
       mail_headers = {},
       render_options: nil,
@@ -132,7 +132,7 @@ module Goodmail
         # DSL blocks can still read mailer ivars and helper methods even though
         # Goodmail evaluates them on its Builder receiver.
         # Source:
-        # https://github.com/rails/rails/blob/097017cd861e4fc57fb7b2612a409538ff2677fc/actionmailer/README.rdoc#L36-L45
+        # https://github.com/rails/rails/blob/debbd18c562df17d01944c475e9291d927910b58/actionmailer/README.rdoc#L20-L37
         render_headers[:context] = self unless goodmail_header_key?(render_headers, :context)
 
         parts = goodmail_render_parts(render_headers, &block)
@@ -145,7 +145,7 @@ module Goodmail
     # It injects the current mailer as the Goodmail render context so app code
     # does not need to repeat `Goodmail.render(..., context: self)` everywhere.
     # Source:
-    # https://github.com/rails/rails/blob/097017cd861e4fc57fb7b2612a409538ff2677fc/actionmailer/README.rdoc#L36-L45
+    # https://github.com/rails/rails/blob/debbd18c562df17d01944c475e9291d927910b58/actionmailer/README.rdoc#L20-L37
     def goodmail_render_parts(render_options = {}, **headers, &block)
       raise ArgumentError, "goodmail_render_parts requires a block" unless block_given?
 
@@ -160,7 +160,7 @@ module Goodmail
     # stays inside the mailer method, so Action Mailer's lazy `MessageDelivery`
     # and `deliver_later` serialization model remain intact.
     # Source:
-    # https://github.com/rails/rails/blob/097017cd861e4fc57fb7b2612a409538ff2677fc/actionmailer/lib/action_mailer/message_delivery.rb#L142-L155
+    # https://github.com/rails/rails/blob/debbd18c562df17d01944c475e9291d927910b58/actionmailer/lib/action_mailer/message_delivery.rb#L142-L155
     def goodmail_mail_parts(parts, mail_headers = {}, unsubscribe_url: DEFAULT_UNSUBSCRIBE_URL, **headers)
       goodmail_apply_parts!(parts)
 
@@ -176,8 +176,8 @@ module Goodmail
       # Rails' documented block form builds explicit text/html responses via
       # ActionMailer::Collector and then lets `mail` assemble the MIME tree.
       # Sources:
-      # - block-form `mail`: https://github.com/rails/rails/blob/097017cd861e4fc57fb7b2612a409538ff2677fc/actionmailer/lib/action_mailer/base.rb#L851-L873
-      # - collector response body: https://github.com/rails/rails/blob/097017cd861e4fc57fb7b2612a409538ff2677fc/actionmailer/lib/action_mailer/collector.rb#L25-L29
+      # - block-form `mail`: https://github.com/rails/rails/blob/debbd18c562df17d01944c475e9291d927910b58/actionmailer/lib/action_mailer/base.rb#L851-L873
+      # - collector response body: https://github.com/rails/rails/blob/debbd18c562df17d01944c475e9291d927910b58/actionmailer/lib/action_mailer/collector.rb#L25-L29
       mail(final_headers) do |format|
         format.text { render plain: parts.text.to_s }
         format.html { render html: parts.html.to_s.html_safe }
@@ -200,7 +200,7 @@ module Goodmail
         # MIME container afterwards (`multipart/related` for inline-only,
         # `multipart/mixed` plus nested related parts for mixed attachments).
         # Source:
-        # https://github.com/rails/rails/blob/097017cd861e4fc57fb7b2612a409538ff2677fc/actionmailer/lib/action_mailer/base.rb#L1024-L1042
+        # https://github.com/rails/rails/blob/debbd18c562df17d01944c475e9291d927910b58/actionmailer/lib/action_mailer/base.rb#L1024-L1042
         target = attachment[:inline] ? attachments.inline : attachments
         payload =
           if attachment[:mime_type].to_s.strip.empty?
@@ -220,7 +220,7 @@ module Goodmail
         # Sources:
         # - RFC 2392: https://www.rfc-editor.org/rfc/rfc2392
         # - Rails CID preview lookup:
-        #   https://github.com/rails/rails/blob/097017cd861e4fc57fb7b2612a409538ff2677fc/actionmailer/lib/action_mailer/inline_preview_interceptor.rb#L33-L57
+        #   https://github.com/rails/rails/blob/debbd18c562df17d01944c475e9291d927910b58/actionmailer/lib/action_mailer/inline_preview_interceptor.rb#L33-L57
         content_id = attachment[:content_id].to_s.strip
         content_id = attachment[:filename].to_s if content_id.empty?
         attachments[attachment[:filename]].content_id = "<#{content_id}>"

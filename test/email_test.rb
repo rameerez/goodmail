@@ -171,6 +171,20 @@ class EmailTest < Minitest::Test
     assert_includes parts.html, "Custom preview"
   end
 
+  def test_render_accepts_string_keys_for_render_options
+    GoodmailTestConfig.configure(show_footer_unsubscribe_link: true)
+
+    parts = Goodmail.render(
+      "subject" => "String Subject",
+      "preheader" => "String preview",
+      "unsubscribe_url" => "https://example.com/string"
+    ) { text "hello" }
+
+    assert_includes parts.html, "<title>String Subject</title>"
+    assert_includes parts.html, "String preview"
+    assert_includes parts.html, 'href="https://example.com/string"'
+  end
+
   def test_render_falls_back_to_config_default_preheader_when_omitted
     GoodmailTestConfig.configure(default_preheader: "Default preview")
     parts = Goodmail.render(subject: "Subj") { text "hello" }

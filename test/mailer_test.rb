@@ -7,14 +7,13 @@ require "test_helper"
 # through `Goodmail.compose`, which is the documented entry point and
 # the only path that uses this class directly. The dispatcher_test
 # covers the orchestration layer; this file zooms in on the Mailer's
-# specific responsibilities:
+# specific responsibilities after `Goodmail.render` has produced the body:
 #
-#   1. Premailer: CSS inlining + plaintext generation
-#   2. List-Unsubscribe + List-Unsubscribe-Post header pair (RFC 8058 /
+#   1. List-Unsubscribe + List-Unsubscribe-Post header pair (RFC 8058 /
 #      Gmail+Yahoo Feb 2024 sender requirements)
-#   3. DSL-attachment fan-out to ActionMailer's attachments hash
-#   4. Inline-image Content-ID pinning (so generated `cid:` URLs resolve)
-#   5. Plaintext cleanup (logo alt line, blank-line compaction)
+#   2. DSL-attachment fan-out to ActionMailer's attachments hash
+#   3. Inline-image Content-ID pinning (so generated `cid:` URLs resolve)
+#   4. Multipart handoff of already inlined HTML and cleaned plaintext
 class MailerTest < Minitest::Test
   # ── Premailer: CSS inlining + plain text part ────────────────────────
 

@@ -23,7 +23,7 @@ A polish-and-correctness release. Adds five new DSL helpers, a comprehensive Min
 - **Action Mailer header passthrough.** `Goodmail.compose` and the auto-installed mailer helpers now forward Action Mailer's normal header surface (`date:`, `return_path:`, delivery options, custom `"X-..."` headers, etc.) after stripping only Goodmail render options. This follows Rails' own `mail` behavior instead of maintaining a narrow Goodmail whitelist.
 
 #### Test suite
-- **252 tests, 907 assertions, 100% line coverage** across the Ruby source. The gem previously had no tests of its own; the README's `rake spec` instruction was aspirational. Run with `rake test`; gate SimpleCov instrumentation on `COVERAGE=1 rake test`.
+- **253 tests, 913 assertions, 100% line coverage** across the Ruby source. The gem previously had no tests of its own; the README's `rake spec` instruction was aspirational. Run with `rake test`; gate SimpleCov instrumentation on `COVERAGE=1 rake test`.
 
 ### Fixed
 
@@ -52,6 +52,7 @@ The plaintext part of every multipart message had four classes of artifact that 
 ### Internal
 - Replaced the `case heading_tag` style lookup inside `Builder`'s `define_method` heading definer with a frozen `HEADING_STYLES` constant. The previous shape carried an unreachable `else` clause that no test could cover by construction; the replacement is shorter, faster (one hash lookup per heading), and exhaustive by definition.
 - Extracted plaintext generation into `Goodmail::Plaintext`. Both `Goodmail::Email.render` and `Goodmail::Mailer#compose_message` previously had their own copies of the cleanup pipeline; consolidating into one module makes plaintext quality testable in one place and prevents future drift between the two paths.
+- `Goodmail.compose` now renders through `Goodmail.render` once, then passes already inlined HTML, cleaned plaintext, and attachment descriptors into the internal Action Mailer action. This removes the duplicate Premailer/plaintext path from `Goodmail::Mailer` while preserving Action Mailer's lazy `MessageDelivery` handoff.
 - `ostruct` declared as an explicit runtime dependency. Goodmail requires it directly (configuration is backed by `OpenStruct`); Ruby 3.4 prints a deprecation warning when ostruct is loaded from the standard library, and Ruby 3.5 removes it from the default gems set entirely.
 
 ### Meta

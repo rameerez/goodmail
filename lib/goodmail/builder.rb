@@ -425,7 +425,7 @@ module Goodmail
       # receiver.
       # Sources:
       #   - Action Mailer actions assign instance variables for templates:
-      #     https://github.com/rails/rails/blob/097017cd861e4fc57fb7b2612a409538ff2677fc/actionmailer/README.rdoc#L36-L45
+      #     https://github.com/rails/rails/blob/debbd18c562df17d01944c475e9291d927910b58/actionmailer/README.rdoc#L20-L37
       #   - Ruby `instance_eval` changes the block receiver:
       #     https://docs.ruby-lang.org/en/3.4/BasicObject.html#method-i-instance_eval
       context.instance_variables.each do |ivar|
