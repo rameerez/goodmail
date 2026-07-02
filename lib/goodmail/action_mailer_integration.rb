@@ -54,8 +54,18 @@ module Goodmail
   # Rails intentionally accepts arbitrary message headers and filters only
   # framework-only render keys internally; Goodmail should follow that shape
   # instead of maintaining a narrow whitelist of envelope fields.
-  # Source:
-  # https://github.com/rails/rails/blob/debbd18c562df17d01944c475e9291d927910b58/actionmailer/lib/action_mailer/base.rb#L972-L976
+  #
+  # Do not validate `to`, `from`, or `reply_to` here. Goodmail owns rendering
+  # and the mechanical Action Mailer handoff, while address acceptance belongs
+  # to the caller and its delivery provider. For example, SES requires ASCII
+  # addresses shaped as `UserName@[SubDomain.]Domain.TopLevelDomain`; another
+  # adapter may support SMTPUTF8 or intentionally use local test domains.
+  #
+  # Sources:
+  # - Rails header handling:
+  #   https://github.com/rails/rails/blob/debbd18c562df17d01944c475e9291d927910b58/actionmailer/lib/action_mailer/base.rb#L972-L976
+  # - SES-specific recipient and SMTPUTF8 constraints:
+  #   https://docs.aws.amazon.com/ses/latest/APIReference/API_SendRawEmail.html
   def self.action_mailer_headers(headers)
     headers.each_with_object({}) do |(key, value), result|
       next if render_header_key?(key)
