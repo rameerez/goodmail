@@ -1,3 +1,9 @@
+## [Unreleased]
+
+### Fixed
+
+- **The layout escapes the subject, the preheader and the unsubscribe URL.** The default layout wrote the subject into `<title>`, the hidden preheader and `<meta itemprop="name" content="…">`, and the unsubscribe URL into `href="…"`, without HTML escaping. A subject that holds a customer's own words (`Invoice from A&B "Shop" <Tienda>`) then broke the attribute or added markup, and a subject cannot carry entities of its own. All four values are now escaped with `ERB::Util.html_escape`. The body stays as the Builder made it. A custom layout (`layout_path:`) must escape these values itself.
+
 ## [0.4.0] - 2026-05-08
 
 A polish-and-correctness release. Adds five new DSL helpers, a comprehensive Minitest 6 test suite (100% line coverage), and fixes nine real-world bugs that surfaced after running every email shape through Mailcatcher and inspecting the rendered HTML, plaintext, headers, and attachments end-to-end. The bug fixes are the headline — most of them silently degraded plaintext quality, deliverability, or accessibility before; downstream apps inherit the fixes for free on upgrade.

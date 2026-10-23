@@ -175,6 +175,34 @@ class LayoutTest < Minitest::Test
     assert_includes html, body
     refute_includes html, "&lt;table"
   end
+
+  # A subject or a preheader is plain text, often built from a customer's
+  # own words ("Invoice from Lumen <Tienda>"), and a subject cannot carry
+  # HTML entities of its own. The layout escapes it in the three places it
+  # writes it, so the text shows as written and adds no markup.
+  def test_render_escapes_the_subject_in_the_title_the_preheader_and_the_meta_tag
+    html = Goodmail::Layout.render("<p>x</p>", %(Invoice from A&B "Shop" <script>alert(1)</script>))
+    escaped = "Invoice from A&amp;B &quot;Shop&quot; &lt;script&gt;alert(1)&lt;/script&gt;"
+
+    assert_includes html, "<title>#{escaped}</title>"
+    assert_includes html, %(<meta itemprop="name" content="#{escaped}" />)
+    assert_equal 3, html.scan(escaped).length
+    refute_includes html, "<script>"
+  end
+
+  def test_render_escapes_the_preheader
+    html = Goodmail::Layout.render("<p>x</p>", "Subj", preheader: %(<img src=x onerror="alert(1)">))
+
+    assert_includes html, "&lt;img src=x onerror=&quot;alert(1)&quot;&gt;"
+    refute_includes html, "<img src=x"
+  end
+
+  def test_render_escapes_the_unsubscribe_url_in_its_attribute
+    GoodmailTestConfig.configure(show_footer_unsubscribe_link: true)
+    html = Goodmail::Layout.render("<p>x</p>", "Subj", unsubscribe_url: %(https://example.com/u?a=1&b="2"))
+
+    assert_includes html, %(href="https://example.com/u?a=1&amp;b=&quot;2&quot;")
+  end
 end
 
 require "tempfile"
