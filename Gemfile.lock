@@ -1,7 +1,7 @@
 PATH
   remote: .
   specs:
-    goodmail (0.4.0)
+    goodmail (0.4.1)
       ostruct (>= 0.6)
       premailer-rails (>= 1.10)
       rails (>= 7.0)
