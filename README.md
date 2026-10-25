@@ -229,6 +229,17 @@ Any normal Action Mailer header you pass (`date:`, `return_path:`,
 Goodmail render options such as `preheader:`, `unsubscribe_url:`, `locale:`,
 `context:`, `config:` / `configuration:`, and `layout_path:` are removed from
 the wire headers.
+
+**What the layout escapes.** The default layout HTML-escapes the four values
+it writes into markup: the subject (in `<title>` and in
+`<meta itemprop="name">`), the preheader, and the unsubscribe URL (in
+`href`). A subject that holds a customer's own words, such as
+`Invoice from A&B "Shop" <Tienda>`, renders as text and never breaks an
+attribute or adds markup. A subject cannot carry HTML entities of its own, so
+do not strip or pre-escape it in your mailer. The body stays as the Builder
+made it. If you ship your own layout with `layout_path:`, escape those four
+values yourself (`ERB::Util.html_escape`), because the gem cannot reach into
+your template.
 The block keeps normal mailer context: instance variables and private mailer
 helpers are available, and `locale:` wraps the DSL block in `I18n.with_locale`.
 
